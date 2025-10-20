@@ -7,6 +7,8 @@ import com.example.managebyclesystem.model.Staff.StaffStatus;
 import com.example.managebyclesystem.repository.StaffRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import java.util.List;
+
 
 @Service
 public class StaffService {
@@ -57,5 +59,10 @@ public class StaffService {
         staffRepository.save(staff);
 
         System.out.println("Thêm nhân viên thành công: " + name);
+    }
+
+    // Lấy nv able
+    public List<Staff> getAllActiveStaffs() {
+        return staffRepository.findByStaffStatus(Staff.StaffStatus.Able);
     }
 }

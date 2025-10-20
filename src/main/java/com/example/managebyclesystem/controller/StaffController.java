@@ -32,4 +32,19 @@ public class StaffController {
             return "redirect:/staffs/error";
         }
     }
+
+    @GetMapping("/list")
+    public String listStaffs() {
+        var staffs = staffService.getAllActiveStaffs();
+        System.out.println("Danh sách nhân viên đang hoạt động:");
+        staffs.forEach(staff -> System.out.println(
+                staff.getStaffId() + " - " +
+                        staff.getStaffName() + " - " +
+                        staff.getStaffPosition() + " - " +
+                        staff.getStaffSalary() + " - " +
+                        staff.getStaffShift()
+        ));
+        return "staffs/list";
+    }
+
 }
