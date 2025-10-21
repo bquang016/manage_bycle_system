@@ -51,6 +51,7 @@ public class BikeService {
         bikeRepository.save(bike);
         System.out.println("✅ Thêm xe đạp thành công: " + bikeName);
     }
-
-
+    public List<Bike> getAllBikes() {
+        return bikeRepository.findAll();
+    }
 }

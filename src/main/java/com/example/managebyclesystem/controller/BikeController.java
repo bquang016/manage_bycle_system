@@ -33,6 +33,20 @@ public class BikeController {
             return "redirect:/bikes/error";
         }
     }
-
+    @GetMapping("/list")
+    public String listBikes() {
+        var bikes = bikeService.getAllBikes();
+        System.out.println("===== DANH SÁCH TOÀN BỘ XE ĐẠP =====");
+        bikes.forEach(bike -> System.out.println(
+                "ID: " + bike.getBikeId() + " | " +
+                        "Ảnh: " + bike.getBikeImage() + " | " +
+                        "Loại: " + bike.getBikeType() + " | " +
+                        "Tên: " + bike.getBikeName() + " | " +
+                        "Giá thuê/giờ: " + bike.getBikeRentPerHour() + " | " +
+                        "Trạng thái: " + bike.getBikeStatus() + " | " +
+                        "Vị trí: " + bike.getBikeLocation()
+        ));
+        return "bikes/list";
+    }
 }
 

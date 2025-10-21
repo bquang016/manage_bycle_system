@@ -5,11 +5,8 @@ import org.hibernate.annotations.Check;
 
 @Entity
 @Table(name = "bike")
-@Check(constraints = "bike_status IN ('Available','Unavailable','Maintenance') AND bike_type IN ('CITY','MOUNTAIN','ELECTRIC','KID')")
+@Check(constraints = "bike_status IN ('Available','Unavailable','Maintenance') AND bike_type IN ('NORMAL','ELECTRIC','KID')")
 public class Bike {
-
-    public void setBikeRentPerHour(double rentPerHour) {
-    }
 
     public enum BikeType {
         NORMAL,
@@ -35,8 +32,9 @@ public class Bike {
 
     private String bikeName;
 
-    @Column(name = "hourly_rate")
-    private double hourlyRate;
+    // ✅ Đổi lại cho đồng bộ với Controller và Service
+    @Column(name = "bike_rent_per_hour")
+    private double bikeRentPerHour;
 
     private String bikeLocation;
 
@@ -44,6 +42,7 @@ public class Bike {
     @Column(name = "bike_status", columnDefinition = "ENUM('Available','Unavailable','Maintenance')")
     private BikeStatus bikeStatus;
 
+    // ===== GETTERS & SETTERS =====
     public int getBikeId() {
         return bikeId;
     }
@@ -76,12 +75,12 @@ public class Bike {
         this.bikeName = bikeName;
     }
 
-    public double getHourlyRate() {
-        return hourlyRate;
+    public double getBikeRentPerHour() {
+        return bikeRentPerHour;
     }
 
-    public void setHourlyRate(double hourlyRate) {
-        this.hourlyRate = hourlyRate;
+    public void setBikeRentPerHour(double bikeRentPerHour) {
+        this.bikeRentPerHour = bikeRentPerHour;
     }
 
     public String getBikeLocation() {
