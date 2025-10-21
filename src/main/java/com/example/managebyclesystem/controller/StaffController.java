@@ -68,4 +68,30 @@ public class StaffController {
             return "redirect:/staffs/error";
         }
     }
+
+    // Tìm theo tên or chức vụ
+    @PostMapping("/search")
+    public String searchStaffs(
+            @RequestParam(value = "keyword", required = false) String keyword,
+            @RequestParam(value = "staffPosition", required = false) String position
+    ) {
+        try {
+            var staffs = staffService.searchStaffs(keyword, position);
+
+            System.out.println("Kết quả tìm kiếm:");
+            staffs.forEach(staff -> System.out.println(
+                    staff.getStaffId() + " - " +
+                            staff.getStaffName() + " - " +
+                            staff.getStaffPosition() + " - " +
+                            staff.getStaffSalary() + " - " +
+                            staff.getStaffShift()
+            ));
+
+            return "redirect:/staffs/success";
+        } catch (Exception e) {
+            System.err.println("Lỗi khi tìm kiếm nhân viên: " + e.getMessage());
+            return "redirect:/staffs/error";
+        }
+    }
+
 }

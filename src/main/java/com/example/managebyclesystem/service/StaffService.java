@@ -7,6 +7,8 @@ import com.example.managebyclesystem.model.Staff.StaffStatus;
 import com.example.managebyclesystem.repository.StaffRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import java.util.List;
+
 
 import java.util.List;
 
@@ -99,5 +101,25 @@ public class StaffService {
 
         staffRepository.save(existingStaff);
         System.out.println("Cập nhật nhân viên thành công: " + existingStaff.getStaffName());
+    }
+
+    // Tìm theo tên or chức vụ
+    public List<Staff> searchStaffs(String keyword, String position) {
+        if ((keyword == null || keyword.trim().isEmpty()) && (position == null || position.trim().isEmpty())) {
+            throw new IllegalArgumentException("Vui lòng nhập tên hoặc chức vụ.");
+        }
+
+        String formattedKeyword = "%" + keyword.trim().toLowerCase() + "%";
+
+        StaffPosition staffPosition = null;
+        if (position != null && !position.trim().isEmpty()) {
+            try {
+                staffPosition = StaffPosition.valueOf(position.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Chức vụ không hợp lệ. Chỉ được: MANAGER, STAFF, SECURITY, MAINTENANCE");
+            }
+        }
+
+        return staffRepository.searchStaffs(formattedKeyword, staffPosition);
     }
 }
