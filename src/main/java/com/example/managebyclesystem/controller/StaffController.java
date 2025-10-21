@@ -49,4 +49,23 @@ public class StaffController {
         ));
         return "staffs/list";
     }
+
+    @PostMapping("/update")
+    public String updateStaff(
+            @RequestParam("staffId") int staffId,
+            @RequestParam("staffName") String staffName,
+            @RequestParam("staffPosition") String position,
+            @RequestParam("staffSalary") double salary,
+            @RequestParam(value = "staffShift", required = false) String shift,
+            @RequestParam(value = "staffRoles", defaultValue = "false") boolean roles
+    ) {
+        try {
+            staffService.updateStaff(staffId, staffName, position, salary, shift, roles);
+            System.out.println("Cập nhật thành công ID: " + staffId);
+            return "redirect:/staffs/success";
+        } catch (Exception e) {
+            System.err.println("Lỗi khi cập nhật nhân viên: " + e.getMessage());
+            return "redirect:/staffs/error";
+        }
+    }
 }

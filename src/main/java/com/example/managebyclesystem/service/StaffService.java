@@ -59,4 +59,45 @@ public class StaffService {
     public List<Staff> getAllActiveStaffs() {
         return staffRepository.findByStaffStatus(Staff.StaffStatus.Able);
     }
+
+
+    // Cập nhật nv
+    public void updateStaff(int staffId, String name, String position, double salary, String shift, boolean roles) {
+        Staff existingStaff = staffRepository.findById(staffId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy nhân viên với ID: " + staffId));
+
+        // Chỉ cho sửa nv able
+        if (existingStaff.getStaffStatus() == StaffStatus.Disable) {
+            throw new RuntimeException("Không thể sửa vì nhân viên đang ở trạng thái Disable.");
+        }
+
+        if (name == null || name.trim().isEmpty()) {
+            throw new IllegalArgumentException("Tên nhân viên không được để trống");
+        }
+
+        // check chức vụ
+        StaffPosition staffPosition;
+        try {
+            staffPosition = StaffPosition.valueOf(position.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Chức vụ không hợp lệ");
+        }
+
+        StaffShift staffShift;
+        try {
+            staffShift = StaffShift.valueOf(shift.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Ca làm việc không hợp lệ");
+        }
+
+        // Cập nhật thông tin mới
+        existingStaff.setStaffName(name.trim());
+        existingStaff.setStaffPosition(staffPosition);
+        existingStaff.setStaffSalary(salary);
+        existingStaff.setStaffShift(staffShift);
+        existingStaff.setStaffRoles(roles);
+
+        staffRepository.save(existingStaff);
+        System.out.println("Cập nhật nhân viên thành công: " + existingStaff.getStaffName());
+    }
 }
