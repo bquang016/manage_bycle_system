@@ -68,4 +68,18 @@ public class StaffController {
             return "redirect:/staffs/error";
         }
     }
+
+
+    @PostMapping("/delete")
+    public String deleteStaff(@RequestParam("staffId") int staffId) {
+        try {
+            staffService.deleteStaff(staffId);
+            System.out.println("Xóa thành công: ID = " + staffId);
+            return "redirect:/staffs/success";
+        } catch (Exception e) {
+            System.err.println("Lỗi khi xóa nhân viên: " + e.getMessage());
+            return "redirect:/staffs/error";
+        }
+    }
+
 }
