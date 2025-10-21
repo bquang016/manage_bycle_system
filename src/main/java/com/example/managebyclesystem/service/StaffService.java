@@ -100,4 +100,22 @@ public class StaffService {
         staffRepository.save(existingStaff);
         System.out.println("Cập nhật nhân viên thành công: " + existingStaff.getStaffName());
     }
+
+    // Xóa nv
+    public void deleteStaff(int staffId) {
+        Staff staff = staffRepository.findById(staffId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy nhân viên với ID: " + staffId));
+
+        // check disable
+        if (staff.getStaffStatus() == StaffStatus.Disable) {
+            throw new RuntimeException("Nhân viên (ID=" + staffId + ") đã xóa trước đó.");
+        }
+
+        // set disable
+        staff.setStaffStatus(StaffStatus.Disable);
+
+        staffRepository.save(staff);
+        System.out.println("Đã xóa nhân viên ID: " + staffId + " (" + staff.getStaffName() + ")");
+    }
+
 }
