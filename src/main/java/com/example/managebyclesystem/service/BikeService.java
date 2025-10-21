@@ -7,6 +7,8 @@ import com.example.managebyclesystem.repository.BikeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class BikeService {
 
@@ -17,9 +19,8 @@ public class BikeService {
         this.bikeRepository = bikeRepository;
     }
 
-    // Thêm xe đạp mới
-    public void addBike(String name, String type, String bikeName, double rentPerHour, String status, String bikeStatus) {
-        if (name == null || name.trim().isEmpty()) {
+    public void addBike(String bikeName, String type, String color, double rentPerHour, String status, String note) {
+        if (bikeName == null || bikeName.trim().isEmpty()) {
             throw new IllegalArgumentException("Tên xe đạp không được để trống");
         }
 
@@ -31,7 +32,7 @@ public class BikeService {
         try {
             bikeType = BikeType.valueOf(type.toUpperCase());
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Loại xe không hợp lệ. Chỉ được: NORMAL, ELECTRIC, KID");
+            throw new IllegalArgumentException("Loại xe không hợp lệ. Chỉ được: NORMAL, MOUNTAIN, ELECTRIC, KID");
         }
 
         BikeStatus bikeStatus;
@@ -42,13 +43,14 @@ public class BikeService {
         }
 
         Bike bike = new Bike();
-        bike.setBikeName(name.trim());
+        bike.setBikeName(bikeName.trim());
         bike.setBikeType(bikeType);
         bike.setBikeRentPerHour(rentPerHour);
         bike.setBikeStatus(bikeStatus);
 
         bikeRepository.save(bike);
-        System.out.println("Thêm xe đạp thành công: " + name);
+        System.out.println("✅ Thêm xe đạp thành công: " + bikeName);
     }
+
 
 }
