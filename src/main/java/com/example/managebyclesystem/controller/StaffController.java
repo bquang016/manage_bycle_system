@@ -1,17 +1,12 @@
 package com.example.managebyclesystem.controller;
 
-import com.example.managebyclesystem.model.Staff;
 import com.example.managebyclesystem.service.StaffService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.http.ResponseEntity;
 
-
-import java.util.List;
-
-@RestController
-@RequestMapping("/api/staffs")
-@CrossOrigin(origins = "*")
+@Controller
+@RequestMapping("/staffs")
 public class StaffController {
 
     private final StaffService staffService;
@@ -21,27 +16,28 @@ public class StaffController {
         this.staffService = staffService;
     }
 
-
+    // Thêm nv
     @PostMapping("/add")
-    public ResponseEntity<String> addStaff(@RequestBody Staff staff) {
+    public String addStaff(
+            @RequestParam("staffName") String staffName,
+            @RequestParam("staffPosition") String position,
+            @RequestParam("staffSalary") double salary,
+            @RequestParam(value = "staffShift", required = false) String shift,
+            @RequestParam(value = "staffRoles", defaultValue = "false") boolean roles
+    ) {
         try {
-            staffService.addStaff(
-                    staff.getStaffName(),
-                    staff.getStaffPosition().toString(),
-                    staff.getStaffSalary(),
-                    staff.getStaffShift().toString(),
-                    staff.isStaffRoles()
-            );
-            return ResponseEntity.ok("Thêm nhân viên thành công!");
+            staffService.addStaff(staffName, position, salary, shift, roles);
+            System.out.println("Thêm nhân viên thành công: " + staffName);
+            return "redirect:/staffs/success";
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Lỗi khi thêm nhân viên: " + e.getMessage());
+            System.err.println("Lỗi khi thêm nhân viên: " + e.getMessage());
+            return "redirect:/staffs/error";
         }
     }
 
-
-
+    // Lấy nv able
     @GetMapping("/list")
-    public List<Staff> listStaffs() {
+    public String listStaffs() {
         var staffs = staffService.getAllActiveStaffs();
         System.out.println("Danh sách nhân viên đang hoạt động:");
         staffs.forEach(staff -> System.out.println(
@@ -51,6 +47,6 @@ public class StaffController {
                         staff.getStaffSalary() + " - " +
                         staff.getStaffShift()
         ));
-        return staffs;
+        return "staffs/list";
     }
 }
