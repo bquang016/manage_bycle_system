@@ -48,5 +48,23 @@ public class BikeController {
         ));
         return "bikes/list";
     }
+
+    @PostMapping("/update")
+    public String updateBike(
+            @RequestParam("bikeId") int bikeId,
+            @RequestParam("bikeName") String bikeName,
+            @RequestParam("bikeType") String bikeType,
+            @RequestParam("hourlyRate") double hourlyRate,
+            @RequestParam("bikeLocation") String bikeLocation,
+            @RequestParam("bikeStatus") String bikeStatus
+    ) {
+        try {
+            bikeService.updateBike(bikeId, bikeName, bikeType, hourlyRate, bikeLocation, bikeStatus);
+            return "redirect:/bikes/success";
+        } catch (Exception e) {
+            System.err.println("Lỗi khi cập nhật xe đạp: " + e.getMessage());
+            return "redirect:/bikes/error";
+        }
+    }
 }
 

@@ -32,7 +32,6 @@ public class Bike {
 
     private String bikeName;
 
-    // ✅ Đổi lại cho đồng bộ với Controller và Service
     @Column(name = "bike_rent_per_hour")
     private double bikeRentPerHour;
 
@@ -42,7 +41,6 @@ public class Bike {
     @Column(name = "bike_status", columnDefinition = "ENUM('Available','Unavailable','Maintenance')")
     private BikeStatus bikeStatus;
 
-    // ===== GETTERS & SETTERS =====
     public int getBikeId() {
         return bikeId;
     }
