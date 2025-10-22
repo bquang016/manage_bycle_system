@@ -44,4 +44,27 @@ public class CustomerService {
         return customerRepo.findAllByOrderByRewardPointsDesc(pageable);
     }
 
+    public Customer addCustomer(Customer customer) {
+
+        if (customer.getCustomerPhone() == null || customer.getCustomerPhone().trim().isEmpty()) {
+            throw new IllegalArgumentException("Số điện thoại không được để trống");
+        }
+        if (customerRepo.existsByCustomerPhone(customer.getCustomerPhone())) {
+            throw new IllegalArgumentException("Số điện thoại đã tồn tại");
+        }
+
+        if (customer.getCustomerEmail() == null || customer.getCustomerEmail().trim().isEmpty()) {
+            throw new IllegalArgumentException("Email không được để trống");
+        }
+        if (!customer.getCustomerEmail().contains("@")) {
+            throw new IllegalArgumentException("Email phải có ký tự '@'");
+        }
+        if (customerRepo.existsByCustomerEmail(customer.getCustomerEmail())) {
+            throw new IllegalArgumentException("Email đã tồn tại");
+        }
+
+        return customerRepo.save(customer);
+    }
+
+
 }
