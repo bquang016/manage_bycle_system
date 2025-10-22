@@ -117,7 +117,19 @@ public class CustomerService {
     public Optional<Customer> getCustomerById(int id) {
         return customerRepo.findById(id);
     }
+    public Page<Customer> getCustomerByName(String name, int page) {
+        Pageable pageable = PageRequest.of(page, PAGE_SIZE);
+        return customerRepo.searchCustomers(name, CustomerStatus.ABLE, pageable);
+    }
 
+    public Page<Customer> getCustomerByEmail(String email, int page){
+        Pageable pageable = PageRequest.of(page, PAGE_SIZE);
+        return  customerRepo.searchCustomers(email,CustomerStatus.ABLE,pageable);
+    }
 
+    public Page<Customer> getCustomerByCardType(String cardType, int page){
+        Pageable pageable = PageRequest.of(page, PAGE_SIZE);
+        return  customerRepo.searchCustomers(cardType, CustomerStatus.ABLE, pageable);
+    }
 
 }

@@ -59,4 +59,5 @@ public interface CustomerRepo extends JpaRepository<Customer, Integer> {
     boolean existsByCustomerEmail(@Param("customerEmail") String customerEmail);
 
 
+    Page<Customer> searchCustomers(@Param("keyword") String keyword, @Param("status") CustomerStatus status, Pageable pageable);
 }
