@@ -4,6 +4,7 @@ import com.example.managebyclesystem.model.Bike;
 import com.example.managebyclesystem.model.Bike.BikeType;
 import com.example.managebyclesystem.model.Bike.BikeStatus;
 import com.example.managebyclesystem.repository.BikeRepository;
+import org.springframework.data.domain.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -85,5 +86,36 @@ public class BikeService {
         bikeRepository.save(bike);
 
         System.out.println("Xe đạp ID " + id + " đã được chuyển sang trạng thái DISABLE");
+    }
+
+    public List<Bike> searchBikes(String name, BikeType type, String location) {
+        return bikeRepository.findAll().stream()
+                .filter(bike ->
+                        bike.getBikeActiveStatus() == Bike.ActiveStatus.ABLE &&
+                                (name == null || name.isEmpty() || bike.getBikeName().toLowerCase().contains(name.toLowerCase())) &&
+                                (type == null || bike.getBikeType() == type) &&
+                                (location == null || location.isEmpty() || bike.getBikeLocation().toLowerCase().contains(location.toLowerCase()))
+                )
+                .toList();
+    }
+
+    public Page<Bike> getPagedAndSortedBikes(int page, int size, String sortBy, String sortDir) {
+        Sort sort = sortDir.equalsIgnoreCase("asc")
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        // Lấy tất cả xe rồi lọc ABLE
+        List<Bike> ableBikes = bikeRepository.findAll(sort).stream()
+                .filter(bike -> bike.getBikeActiveStatus() == Bike.ActiveStatus.ABLE)
+                .toList();
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), ableBikes.size());
+
+        List<Bike> pagedBikes = ableBikes.subList(start, end);
+
+        return new PageImpl<>(pagedBikes, pageable, ableBikes.size());
     }
 }
