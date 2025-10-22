@@ -43,4 +43,18 @@ public interface CustomerRepo extends JpaRepository<Customer, Integer> {
         ORDER BY c.rewardPoints DESC
         """)
     Page<Customer> findAllByOrderByRewardPointsDesc(Pageable pageable);
+
+    @Query("""
+        SELECT CASE WHEN COUNT(c) > 0 THEN TRUE ELSE FALSE END
+        FROM Customer c
+        WHERE c.customerPhone = :customerPhone
+        """)
+    boolean existsByCustomerPhone(@Param("customerPhone") String customerPhone);
+
+    @Query("""
+        SELECT CASE WHEN COUNT(c) > 0 THEN TRUE ELSE FALSE END
+        FROM Customer c
+        WHERE c.customerEmail = :customerEmail
+        """)
+    boolean existsByCustomerEmail(@Param("customerEmail") String customerEmail);
 }
