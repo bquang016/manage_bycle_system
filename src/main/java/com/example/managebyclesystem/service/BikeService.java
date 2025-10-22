@@ -19,78 +19,71 @@ public class BikeService {
         this.bikeRepository = bikeRepository;
     }
 
-    public void addBike(String bikeName, String type, String color, double rentPerHour, String status, String note) {
-        if (bikeName == null || bikeName.trim().isEmpty()) {
+    public void addBike(Bike bike) {
+        if (bike.getBikeName() == null || bike.getBikeName().trim().isEmpty()) {
             throw new IllegalArgumentException("Tên xe đạp không được để trống");
         }
-
-        if (rentPerHour < 0) {
+        if (bike.getBikeRentPerHour() < 0) {
             throw new IllegalArgumentException("Giá thuê mỗi giờ phải lớn hơn hoặc bằng 0");
         }
-
-        BikeType bikeType;
-        try {
-            bikeType = BikeType.valueOf(type.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Loại xe không hợp lệ. Chỉ được: NORMAL, MOUNTAIN, ELECTRIC, KID");
+        if (bike.getBikeType() == null) {
+            throw new IllegalArgumentException("Loại xe không hợp lệ");
+        }
+        if (bike.getBikeStatus() == null) {
+            throw new IllegalArgumentException("Trạng thái xe không hợp lệ");
         }
 
-        BikeStatus bikeStatus;
-        try {
-            bikeStatus = BikeStatus.valueOf(status.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Trạng thái xe không hợp lệ. Chỉ được: AVAILABLE, UNAVAILABLE, MAINTENANCE");
-        }
-
-        Bike bike = new Bike();
-        bike.setBikeName(bikeName.trim());
-        bike.setBikeType(bikeType);
-        bike.setBikeRentPerHour(rentPerHour);
-        bike.setBikeStatus(bikeStatus);
+        bike.setBikeActiveStatus(Bike.ActiveStatus.ABLE);
 
         bikeRepository.save(bike);
-        System.out.println("Thêm xe đạp thành công: " + bikeName);
-    }
-    public List<Bike> getAllBikes() {
-        return bikeRepository.findAll();
+        System.out.println("Thêm xe đạp thành công: " + bike.getBikeName());
     }
 
-    public void updateBike(int id, String name, String type, double hourlyRate, String location, String status) {
-        var bikeOpt = bikeRepository.findById(id);
-        if (bikeOpt.isEmpty()) {
-            throw new IllegalArgumentException("Không tìm thấy xe đạp có ID: " + id);
+    public List<Bike> getAllBikes() {
+        return bikeRepository.findAll().stream()
+                .filter(bike -> bike.getBikeActiveStatus() == Bike.ActiveStatus.ABLE)
+                .toList();
+    }
+
+    public void updateBike(Bike updatedBike) {
+        if (updatedBike.getBikeId() == 0) {
+            throw new IllegalArgumentException("ID xe đạp không hợp lệ để cập nhật");
         }
 
-        Bike bike = bikeOpt.get();
+        Bike existingBike = bikeRepository.findById(updatedBike.getBikeId())
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy xe đạp có ID: " + updatedBike.getBikeId()));
 
-        if (name == null || name.trim().isEmpty()) {
+        if (updatedBike.getBikeName() == null || updatedBike.getBikeName().trim().isEmpty()) {
             throw new IllegalArgumentException("Tên xe đạp không được để trống");
         }
-
-        if (hourlyRate < 0) {
+        if (updatedBike.getBikeRentPerHour() < 0) {
             throw new IllegalArgumentException("Giá thuê mỗi giờ phải ≥ 0");
         }
-        Bike.BikeType bikeType;
-        try {
-            bikeType = Bike.BikeType.valueOf(type.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Loại xe không hợp lệ. Chỉ được: NORMAL, ELECTRIC, KID");
-        }
-        Bike.BikeStatus bikeStatus;
-        try {
-            bikeStatus = Bike.BikeStatus.valueOf(status.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Trạng thái không hợp lệ. Chỉ được: Available, Unavailable, Maintenance");
-        }
 
-        bike.setBikeName(name.trim());
-        bike.setBikeType(bikeType);
-        bike.setBikeRentPerHour(hourlyRate);
-        bike.setBikeLocation(location);
-        bike.setBikeStatus(bikeStatus);
+        existingBike.setBikeName(updatedBike.getBikeName().trim());
+        existingBike.setBikeType(updatedBike.getBikeType());
+        existingBike.setBikeRentPerHour(updatedBike.getBikeRentPerHour());
+        existingBike.setBikeLocation(updatedBike.getBikeLocation());
+        existingBike.setBikeStatus(updatedBike.getBikeStatus());
 
-        bikeRepository.save(bike);
-        System.out.println("Cập nhật xe đạp thành công: " + bike.getBikeName());
+        if (updatedBike.getBikeImage() != null && !updatedBike.getBikeImage().isEmpty()) {
+            existingBike.setBikeImage(updatedBike.getBikeImage());
+        }
+        bikeRepository.save(existingBike);
+        System.out.println("Cập nhật xe đạp thành công: " + existingBike.getBikeName());
     }
 
+    public void disableBike(int id) {
+        Bike bike = bikeRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy xe đạp có ID: " + id));
+
+        if (bike.getBikeActiveStatus() == Bike.ActiveStatus.DISABLE) {
+            throw new IllegalStateException("Xe đạp này đã bị vô hiệu hóa trước đó.");
+        }
+
+        bike.setBikeActiveStatus(Bike.ActiveStatus.DISABLE);
+        bikeRepository.save(bike);
+
+        System.out.println("Xe đạp ID " + id + " đã được chuyển sang trạng thái DISABLE");
+    }
 }
