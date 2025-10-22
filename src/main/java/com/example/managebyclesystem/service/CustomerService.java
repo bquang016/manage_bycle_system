@@ -24,4 +24,24 @@ public class CustomerService {
         Pageable pageable = PageRequest.of(page, PAGE_SIZE);
         return customerRepo.findByStatus(CustomerStatus.ABLE, pageable);
     }
+    public Page<Customer> getAllByOrderByNameAsc(int page) {
+        Pageable pageable = PageRequest.of(page, PAGE_SIZE);
+        return customerRepo.findAllByOrderByCustomerNameAsc(pageable);
+    }
+
+    public Page<Customer> getAllByOrderByNameDesc(int page) {
+        Pageable pageable = PageRequest.of(page, PAGE_SIZE);
+        return customerRepo.findAllByOrderByCustomerNameDesc(pageable);
+    }
+
+    public Page<Customer> getAllByOrderByRewardPointAsc(int page) {
+        Pageable pageable = PageRequest.of(page, PAGE_SIZE);
+        return customerRepo.findAllByOrderByRewardPointsAsc(pageable);
+    }
+
+    public Page<Customer> getAllByOrderByRewardPointDesc(int page) {
+        Pageable pageable = PageRequest.of(page, PAGE_SIZE);
+        return customerRepo.findAllByOrderByRewardPointsDesc(pageable);
+    }
+
 }
