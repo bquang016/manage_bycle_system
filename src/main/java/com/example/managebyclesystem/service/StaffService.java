@@ -6,9 +6,11 @@ import com.example.managebyclesystem.model.Staff.StaffShift;
 import com.example.managebyclesystem.model.Staff.StaffStatus;
 import com.example.managebyclesystem.repository.StaffRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
 
 @Service
 public class StaffService {
@@ -20,40 +22,29 @@ public class StaffService {
         this.staffRepository = staffRepository;
     }
 
-    public void addStaff(String name, String position, double salary, String shift, boolean roles) {
-        if (name == null || name.trim().isEmpty()) {
+    public void addStaff(Staff staff) {
+
+        if (staff.getStaffName() == null || staff.getStaffName().trim().isEmpty()) {
             throw new IllegalArgumentException("Tên nhân viên không được để trống");
         }
 
-        if (salary <= 0) {
+        if (staff.getStaffSalary() <= 0) {
             throw new IllegalArgumentException("Lương phải lớn hơn 0");
         }
-
-        StaffPosition staffPosition;
-        try {
-            staffPosition = StaffPosition.valueOf(position.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Chức vụ không hợp lệ. Chỉ được: MANAGER, STAFF, SECURITY, MAINTENANCE");
+        // check chức vụ
+        if (staff.getStaffPosition() == null) {
+            throw new IllegalArgumentException("Chức vụ không hợp lệ (MANAGER, STAFF, SECURITY, MAINTENANCE)");
         }
-
-        StaffShift staffShift;
-        try {
-            staffShift = StaffShift.valueOf(shift.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Ca làm việc không hợp lệ. Chỉ được: MORNING, AFTERNOON, EVENING, FULLDAY");
+        // check ca làm
+        if (staff.getStaffShift() == null) {
+            throw new IllegalArgumentException("Ca làm việc không hợp lệ (MORNING, AFTERNOON, EVENING, FULLDAY)");
         }
-
-        Staff staff = new Staff();
-        staff.setStaffName(name.trim());
-        staff.setStaffPosition(staffPosition);
-        staff.setStaffSalary(salary);
-        staff.setStaffShift(staffShift);
-        staff.setStaffRoles(roles);
-        staff.setStaffStatus(StaffStatus.Able); // Mặc định able
+        staff.setStaffStatus(Staff.StaffStatus.Able); // mặc định able
 
         staffRepository.save(staff);
-        System.out.println("Thêm nhân viên thành công: " + name);
+        System.out.println("Thêm nhân viên thành công: " + staff.getStaffName());
     }
+
 
     // Lấy danh sách nv able
     public List<Staff> getAllActiveStaffs() {
@@ -62,60 +53,89 @@ public class StaffService {
 
 
     // Cập nhật nv
-    public void updateStaff(int staffId, String name, String position, double salary, String shift, boolean roles) {
-        Staff existingStaff = staffRepository.findById(staffId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy nhân viên với ID: " + staffId));
+    public void updateStaff(Staff updatedStaff) {
+        Staff existingStaff = staffRepository.findById(updatedStaff.getStaffId())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy nhân viên với ID: " + updatedStaff.getStaffId()));
 
-        // Chỉ cho sửa nv able
+        // Check disable
         if (existingStaff.getStaffStatus() == StaffStatus.Disable) {
             throw new RuntimeException("Không thể sửa vì nhân viên đang ở trạng thái Disable.");
         }
 
-        if (name == null || name.trim().isEmpty()) {
+        if (updatedStaff.getStaffName() == null || updatedStaff.getStaffName().trim().isEmpty()) {
             throw new IllegalArgumentException("Tên nhân viên không được để trống");
         }
 
-        // check chức vụ
-        StaffPosition staffPosition;
-        try {
-            staffPosition = StaffPosition.valueOf(position.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Chức vụ không hợp lệ");
+        StaffPosition staffPosition = updatedStaff.getStaffPosition();
+        if (staffPosition == null) {
+            throw new IllegalArgumentException("Chức vụ không hợp lệ. Chỉ được: MANAGER, STAFF, SECURITY, MAINTENANCE");
         }
 
-        StaffShift staffShift;
-        try {
-            staffShift = StaffShift.valueOf(shift.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Ca làm việc không hợp lệ");
+        StaffShift staffShift = updatedStaff.getStaffShift();
+        if (staffShift == null) {
+            throw new IllegalArgumentException("Ca làm việc không hợp lệ. Chỉ được: MORNING, AFTERNOON, EVENING, FULLDAY");
         }
 
-        // Cập nhật thông tin mới
-        existingStaff.setStaffName(name.trim());
+        // cập nhật thtin mới
+        existingStaff.setStaffName(updatedStaff.getStaffName().trim());
         existingStaff.setStaffPosition(staffPosition);
-        existingStaff.setStaffSalary(salary);
+        existingStaff.setStaffSalary(updatedStaff.getStaffSalary());
         existingStaff.setStaffShift(staffShift);
-        existingStaff.setStaffRoles(roles);
+        existingStaff.setStaffRoles(updatedStaff.isStaffRoles());
 
         staffRepository.save(existingStaff);
         System.out.println("Cập nhật nhân viên thành công: " + existingStaff.getStaffName());
     }
 
-    // Xóa nv
+
+    // Tìm theo tên or chức vụ
+    public List<Staff> searchStaffs(String keyword, String position) {
+        if ((keyword == null || keyword.trim().isEmpty()) && (position == null || position.trim().isEmpty())) {
+            throw new IllegalArgumentException("Vui lòng nhập tên hoặc chức vụ.");
+        }
+
+        String formattedKeyword = "%" + keyword.trim().toLowerCase() + "%";
+
+        StaffPosition staffPosition = null;
+        if (position != null && !position.trim().isEmpty()) {
+            try {
+                staffPosition = StaffPosition.valueOf(position.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Chức vụ không hợp lệ. Chỉ được: MANAGER, STAFF, SECURITY, MAINTENANCE");
+            }
+        }
+
+        return staffRepository.searchStaffs(formattedKeyword, staffPosition);
+    }
+
+    // xóa nv
     public void deleteStaff(int staffId) {
         Staff staff = staffRepository.findById(staffId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy nhân viên với ID: " + staffId));
-
-        // check disable
+        //check disable
         if (staff.getStaffStatus() == StaffStatus.Disable) {
-            throw new RuntimeException("Nhân viên (ID=" + staffId + ") đã xóa trước đó.");
+            throw new RuntimeException("Nhân viên (ID=" + staffId + ") đã bị vô hiệu hóa trước đó.");
         }
-
         // set disable
         staff.setStaffStatus(StaffStatus.Disable);
-
         staffRepository.save(staff);
-        System.out.println("Đã xóa nhân viên ID: " + staffId + " (" + staff.getStaffName() + ")");
+
+        System.out.println("Đã xóa nhân viên: " + staff.getStaffName() + " (ID = " + staffId + ")");
     }
 
+
+    // sắp xếp + phân trang
+    public Page<Staff> getPaginatedAndSortedStaffs(int pageNo, int pageSize, String sortField, String sortDir) {
+
+        int pageIndex = pageNo - 1;
+
+        Sort sort = sortDir.equalsIgnoreCase("asc")
+                ? Sort.by(sortField).ascending()
+                : Sort.by(sortField).descending();
+
+        Pageable pageable = PageRequest.of(pageIndex, pageSize, sort);
+
+        // không lấy disable
+        return staffRepository.findByStaffStatusNot(StaffStatus.Disable, pageable);
+    }
 }
