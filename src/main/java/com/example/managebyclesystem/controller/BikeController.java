@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @Controller
 @RequestMapping("/bikes")
@@ -20,13 +21,13 @@ public class BikeController {
     }
 
     @PostMapping("/add")
-    public String addBike(@ModelAttribute Bike bike, Model model) {
+    public String addBike(@ModelAttribute Bike bike,
+                          @RequestParam("imageFile") MultipartFile imageFile,
+                          Model model) {
         try {
-            bikeService.addBike(bike);
-            System.out.println("Thêm xe đạp thành công: " + bike.getBikeName());
-            return "redirect:/bikes/success"; // Dùng redirect sau khi POST
+            bikeService.addBike(bike, imageFile);
+            return "redirect:/bikes/success";
         } catch (Exception e) {
-            System.err.println("Lỗi khi thêm xe đạp: " + e.getMessage());
             model.addAttribute("errorMessage", e.getMessage());
             return "bikes/error";
         }
@@ -47,12 +48,13 @@ public class BikeController {
     }
 
     @PostMapping("/update")
-    public String updateBike(@ModelAttribute Bike bike, Model model) {
+    public String updateBike(@ModelAttribute Bike bike,
+                             @RequestParam("imageFile") MultipartFile imageFile,
+                             Model model) {
         try {
-            bikeService.updateBike(bike);
+            bikeService.updateBike(bike, imageFile);
             return "redirect:/bikes/success";
         } catch (Exception e) {
-            System.err.println("Lỗi khi cập nhật xe đạp: " + e.getMessage());
             model.addAttribute("errorMessage", e.getMessage());
             return "bikes/error";
         }
