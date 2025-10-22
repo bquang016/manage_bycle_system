@@ -9,6 +9,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
+import java.util.Optional;
+
 @Service
 public class CustomerService {
     private final CustomerRepo customerRepo;
@@ -65,6 +68,56 @@ public class CustomerService {
 
         return customerRepo.save(customer);
     }
+
+    public Customer updateCustomer(int id, Customer newCustomerData) {
+        Customer existing = customerRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy khách hàng"));
+
+        boolean changed = false;
+
+
+        if (newCustomerData.getCustomerName() != null
+                && !Objects.equals(existing.getCustomerName(), newCustomerData.getCustomerName())) {
+            existing.setCustomerName(newCustomerData.getCustomerName());
+            changed = true;
+        }
+
+        if (newCustomerData.getCustomerPhone() != null
+                && !Objects.equals(existing.getCustomerPhone(), newCustomerData.getCustomerPhone())) {
+            if (customerRepo.existsByCustomerPhone(newCustomerData.getCustomerPhone())) {
+                throw new IllegalArgumentException("Số điện thoại đã tồn tại");
+            }
+            existing.setCustomerPhone(newCustomerData.getCustomerPhone());
+            changed = true;
+        }
+
+        if (newCustomerData.getCustomerEmail() != null
+                && !Objects.equals(existing.getCustomerEmail(), newCustomerData.getCustomerEmail())) {
+            if (customerRepo.existsByCustomerEmail(newCustomerData.getCustomerEmail())) {
+                throw new IllegalArgumentException("Email đã tồn tại");
+            }
+            existing.setCustomerEmail(newCustomerData.getCustomerEmail());
+            changed = true;
+        }
+
+        if (newCustomerData.getRewardPoints() != 0
+                && existing.getRewardPoints() != newCustomerData.getRewardPoints()) {
+            existing.setRewardPoints(newCustomerData.getRewardPoints());
+            changed = true;
+        }
+
+        if (newCustomerData.getCardType() != null
+                && !Objects.equals(existing.getCardType(), newCustomerData.getCardType())) {
+            existing.setCardType(newCustomerData.getCardType());
+            changed = true;
+        }
+
+        return changed ? customerRepo.save(existing) : existing;
+    }
+    public Optional<Customer> getCustomerById(int id) {
+        return customerRepo.findById(id);
+    }
+
 
 
 }
