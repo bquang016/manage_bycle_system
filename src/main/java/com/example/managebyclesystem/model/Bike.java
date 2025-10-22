@@ -19,6 +19,10 @@ public class Bike {
         Unavailable,
         Maintenance
     }
+    public enum ActiveStatus {
+        ABLE,
+        DISABLE
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,6 +44,10 @@ public class Bike {
     @Enumerated(EnumType.STRING)
     @Column(name = "bike_status", columnDefinition = "ENUM('Available','Unavailable','Maintenance')")
     private BikeStatus bikeStatus;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "bike_active_status", columnDefinition = "ENUM('ABLE','DISABLE')")
+    private ActiveStatus bikeActiveStatus;
 
     public int getBikeId() {
         return bikeId;
@@ -95,5 +103,13 @@ public class Bike {
 
     public void setBikeStatus(BikeStatus bikeStatus) {
         this.bikeStatus = bikeStatus;
+    }
+
+    public ActiveStatus getBikeActiveStatus() {
+        return bikeActiveStatus;
+    }
+
+    public void setBikeActiveStatus(ActiveStatus bikeActiveStatus) {
+        this.bikeActiveStatus = bikeActiveStatus;
     }
 }
