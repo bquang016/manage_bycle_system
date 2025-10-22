@@ -8,7 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import java.util.List;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 
 @Repository
@@ -20,4 +21,5 @@ public interface StaffRepository extends JpaRepository<Staff, Integer> {
             "AND (LOWER(s.staffName) LIKE LOWER(:keyword) " +
             "OR s.staffPosition = :position)")
     List<Staff> searchStaffs(@Param("keyword") String keyword, @Param("position") StaffPosition position);
+    Page<Staff> findByStaffStatusNot(StaffStatus status, Pageable pageable);
 }
