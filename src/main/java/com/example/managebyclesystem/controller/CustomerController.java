@@ -80,4 +80,24 @@ public class CustomerController {
         }
 
     }
+    @GetMapping("/edit/{id}")
+    public String showEditForm(@PathVariable int id, Model model) {
+        Customer customer = customerService.getCustomerById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy khách hàng id: " + id));
+        model.addAttribute("customer", customer);
+        return "customers/edit";
+    }
+
+
+    @PostMapping("/edit/{id}")
+    public String updateCustomer(@PathVariable int id, @ModelAttribute("customer") Customer newCustomer, Model model) {
+        try {
+            customerService.updateCustomer(id, newCustomer);
+            return "redirect:/customers";
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("errorMessage", e.getMessage());
+            return "customers/edit";
+        }
+    }
+
 }

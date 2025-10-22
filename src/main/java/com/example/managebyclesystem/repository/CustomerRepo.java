@@ -57,4 +57,6 @@ public interface CustomerRepo extends JpaRepository<Customer, Integer> {
         WHERE c.customerEmail = :customerEmail
         """)
     boolean existsByCustomerEmail(@Param("customerEmail") String customerEmail);
+
+
 }
