@@ -2,11 +2,13 @@ package com.example.managebyclesystem.service;
 
 import com.example.managebyclesystem.model.Bike;
 import com.example.managebyclesystem.model.Bike.BikeType;
-import com.example.managebyclesystem.model.Bike.BikeStatus;
+import org.springframework.web.multipart.MultipartFile;
+import java.nio.file.*;
 import com.example.managebyclesystem.repository.BikeRepository;
 import org.springframework.data.domain.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import java.io.IOException;
 
 import java.util.List;
 
@@ -14,13 +16,13 @@ import java.util.List;
 public class BikeService {
 
     private final BikeRepository bikeRepository;
-
+    private static final String UPLOAD_DIR = "uploads/bikes/";
     @Autowired
     public BikeService(BikeRepository bikeRepository) {
         this.bikeRepository = bikeRepository;
     }
 
-    public void addBike(Bike bike) {
+    public void addBike(Bike bike, MultipartFile imageFile) {
         if (bike.getBikeName() == null || bike.getBikeName().trim().isEmpty()) {
             throw new IllegalArgumentException("Tên xe đạp không được để trống");
         }
@@ -32,6 +34,18 @@ public class BikeService {
         }
         if (bike.getBikeStatus() == null) {
             throw new IllegalArgumentException("Trạng thái xe không hợp lệ");
+        }
+        // ✅ Lưu ảnh nếu có tải lên
+        if (imageFile != null && !imageFile.isEmpty()) {
+            try {
+                String fileName = System.currentTimeMillis() + "_" + imageFile.getOriginalFilename();
+                Path path = Paths.get(UPLOAD_DIR + fileName);
+                Files.createDirectories(path.getParent());
+                Files.copy(imageFile.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+                bike.setBikeImage("/uploads/bikes/" + fileName);
+            } catch (IOException e) {
+                throw new RuntimeException("Lỗi khi lưu ảnh: " + e.getMessage());
+            }
         }
 
         bike.setBikeActiveStatus(Bike.ActiveStatus.ABLE);
@@ -46,7 +60,7 @@ public class BikeService {
                 .toList();
     }
 
-    public void updateBike(Bike updatedBike) {
+    public void updateBike(Bike updatedBike, MultipartFile imageFile) {
         if (updatedBike.getBikeId() == 0) {
             throw new IllegalArgumentException("ID xe đạp không hợp lệ để cập nhật");
         }
@@ -67,9 +81,18 @@ public class BikeService {
         existingBike.setBikeLocation(updatedBike.getBikeLocation());
         existingBike.setBikeStatus(updatedBike.getBikeStatus());
 
-        if (updatedBike.getBikeImage() != null && !updatedBike.getBikeImage().isEmpty()) {
-            existingBike.setBikeImage(updatedBike.getBikeImage());
+        if (imageFile != null && !imageFile.isEmpty()) {
+            try {
+                String fileName = System.currentTimeMillis() + "_" + imageFile.getOriginalFilename();
+                Path path = Paths.get(UPLOAD_DIR + fileName);
+                Files.createDirectories(path.getParent());
+                Files.copy(imageFile.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+                existingBike.setBikeImage("/uploads/bikes/" + fileName);
+            } catch (IOException e) {
+                throw new RuntimeException("Lỗi khi cập nhật ảnh: " + e.getMessage());
+            }
         }
+
         bikeRepository.save(existingBike);
         System.out.println("Cập nhật xe đạp thành công: " + existingBike.getBikeName());
     }
