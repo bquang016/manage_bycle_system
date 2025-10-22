@@ -132,4 +132,10 @@ public class CustomerService {
         return  customerRepo.searchCustomers(cardType, CustomerStatus.ABLE, pageable);
     }
 
+    public void deleteCustomer(int id){
+        Customer existing = customerRepo.findById(id).orElseThrow(() -> new RuntimeException("Không tìm thấy khách hàng id: " + id));
+        existing.setStatus(CustomerStatus.DISABLE);
+        customerRepo.save(existing);
+
+    }
 }

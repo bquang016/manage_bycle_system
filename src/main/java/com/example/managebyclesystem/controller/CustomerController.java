@@ -144,4 +144,10 @@ public class CustomerController {
         return "customers/list";
     }
 
+    @GetMapping("/delete/{id}")
+    public String deleteCustomer(@PathVariable int id) {
+        customerService.deleteCustomer(id);
+        return "redirect:/customers";
+    }
+
 }
