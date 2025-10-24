@@ -82,15 +82,15 @@ public class BikeController {
         }
     }
 
-    @GetMapping("/update/{id}")
+    @GetMapping("/edit/{id}")
     public String showUpdateForm(@PathVariable int id, Model model) {
         Bike bike = bikeService.getBikeById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy xe đạp ID: " + id));
         model.addAttribute("bike", bike);
-        return "bikes/update";
+        return "bikes/edit";
     }
 
-    @PostMapping("/update")
+    @PostMapping("/edit")
     public String updateBike(@ModelAttribute("bike") Bike bike,
                              @RequestParam("imageFile") MultipartFile imageFile,
                              Model model) {
@@ -99,7 +99,7 @@ public class BikeController {
             return "redirect:/bikes";
         } catch (IllegalArgumentException e) {
             model.addAttribute("errorMessage", e.getMessage());
-            return "bikes/update";
+            return "bikes/edit";
         }
     }
 

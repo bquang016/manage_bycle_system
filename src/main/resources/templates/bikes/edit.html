@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <title th:text="'Sửa Xe đạp - ' + ${bike.bikeName ?: 'Không tìm thấy'}">Sửa Xe đạp</title>
+    <th:block layout:fragment="page_css">
+        <link rel="stylesheet" th:href="@{/css/bicycle.css}"/>
+    </th:block>
+</head>
+<body>
+<div layout:fragment="content">
+    <h4 class="fw-bold py-3 mb-4">
+        <span class="text-muted fw-light">Quản lý Xe đạp /</span> Sửa thông tin
+    </h4>
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0" th:text="'Sửa thông tin: ' + ${bike.bikeName ?: 'Lỗi'}"></h5>
+                    <a th:href="@{/bikes}" class="btn btn-sm btn-outline-secondary"><i class='bx bx-arrow-back'></i> Quay lại</a>
+                </div>
+                <div class="card-body">
+                    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <strong th:text="${errorMessage}">Lỗi!</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    <div th:if="${#fields.hasErrors('bike.*')}" class="alert alert-warning" role="alert">
+                        Vui lòng kiểm tra lại thông tin:
+                        <ul> <li th:each="err : ${#fields.errors('bike.*')}" th:text="${err}" /> </ul>
+                    </div>
+
+                    <form th:action="@{/bikes/edit}" th:object="${bike}" method="post" enctype="multipart/form-data">
+                        <input type="hidden" th:field="*{bikeId}" />
+                        <input type="hidden" th:field="*{bikeActiveStatus}" /> <div class="mb-3">
+                        <label class="form-label" for="bikeName">Tên xe</label>
+                        <input type="text" class="form-control" id="bikeName" th:field="*{bikeName}" required="required" />
+                        <small class="text-danger" th:if="${#fields.hasErrors('bikeName')}" th:errors="*{bikeName}"></small>
+                    </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="bikeType">Loại xe</label>
+                                <select class="form-select" id="bikeType" th:field="*{bikeType}" required="required">
+                                    <option th:each="typeOpt : ${T(com.example.managebyclesystem.model.Bike.BikeType).values()}"
+                                            th:value="${typeOpt}"
+                                            th:text="${typeOpt.name() == 'NORMAL' ? 'Xe thường' : (typeOpt.name() == 'ELECTRIC' ? 'Xe điện' : 'Xe trẻ em')}"></option>
+                                </select>
+                                <small class="text-danger" th:if="${#fields.hasErrors('bikeType')}" th:errors="*{bikeType}"></small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="bikeRentPerHour">Giá thuê/giờ (VND)</label>
+                                <input type="number" class="form-control" id="bikeRentPerHour" th:field="*{bikeRentPerHour}" required="required" min="0" step="1000" />
+                                <small class="text-danger" th:if="${#fields.hasErrors('bikeRentPerHour')}" th:errors="*{bikeRentPerHour}"></small>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="bikeStatus">Trạng thái</label>
+                            <select class="form-select" id="bikeStatus" th:field="*{bikeStatus}">
+                                <option th:each="statusOpt : ${T(com.example.managebyclesystem.model.Bike.BikeStatus).values()}"
+                                        th:value="${statusOpt}"
+                                        th:text="${statusOpt.name() == 'Available' ? 'Có sẵn' : (statusOpt.name() == 'Unavailable' ? 'Không có' : 'Bảo trì')}"></option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="imageFile" class="form-label">Hình ảnh mới (nếu muốn thay đổi)</label>
+                            <input class="form-control" type="file" id="imageFile" name="imageFile" accept="image/*">
+                            <div th:if="${bike.bikeImage != null and not #strings.isEmpty(bike.bikeImage)}" class="mt-2">
+                                <p class="mb-1 small text-muted">Ảnh hiện tại:</p>
+                                <img th:src="${bike.bikeImage}" alt="Ảnh hiện tại" class="img-thumbnail" style="max-height: 100px;"
+                                     onerror="this.style.display='none'; this.previousElementSibling.innerText='Không thể tải ảnh hiện tại';"/>
+                            </div>
+                            <div th:unless="${bike.bikeImage != null and not #strings.isEmpty(bike.bikeImage)}" class="mt-2">
+                                <p class="mb-1 small text-muted">Chưa có ảnh hiện tại.</p>
+                            </div>
+                            <div class="mt-2 text-center" id="image-preview-container" style="display: none;">
+                                <p class="mb-1 small text-muted">Ảnh xem trước (ảnh mới):</p>
+                                <img id="image-preview" src="#" alt="Xem trước ảnh mới" class="img-thumbnail" style="max-height: 150px; max-width: 100%;" />
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                        <a th:href="@{/bikes}" class="btn btn-outline-secondary">Hủy</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="page_scripts">
+    <script>
+        $('#imageFile').on('change', function () {
+            const input = this;
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    $('#image-preview').attr('src', e.target.result);
+                    $('#image-preview-container').show();
+                }
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                $('#image-preview-container').hide();
+            }
+        });
+    </script>
+</th:block>
+</body>
+</html>
