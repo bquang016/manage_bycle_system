@@ -66,7 +66,7 @@ public class CustomerController {
     @GetMapping("/add")
     public String showAddForm(Model model) {
         model.addAttribute("customer", new Customer());
-        return "list";
+        return "customers/add";
     }
 
     @PostMapping("/add")
@@ -76,7 +76,7 @@ public class CustomerController {
             return "redirect:/customers";
         } catch (IllegalArgumentException e) {
             model.addAttribute("errorMessage", e.getMessage());
-            return "list";
+            return "customers/add";
         }
 
     }
