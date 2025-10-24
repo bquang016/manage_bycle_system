@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <title th:text="'Sửa Khách hàng - ' + ${customer.customerName ?: 'Không tìm thấy'}">Sửa Khách hàng</title>
+    <th:block layout:fragment="page_css">
+        <link rel="stylesheet" th:href="@{/css/customer.css}" />
+    </th:block>
+</head>
+<body>
+<div layout:fragment="content">
+    <h4 class="fw-bold py-3 mb-4">
+        <span class="text-muted fw-light">Quản lý Khách hàng /</span> Sửa thông tin
+    </h4>
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0" th:text="'Sửa thông tin: ' + ${customer.customerName ?: 'Lỗi'}"></h5>
+                    <a th:href="@{/customers}" class="btn btn-sm btn-outline-secondary"><i class='bx bx-arrow-back'></i> Quay lại</a>
+                </div>
+                <div class="card-body">
+                    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <strong th:text="${errorMessage}">Lỗi!</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    <div th:if="${#fields.hasErrors('customer.*')}" class="alert alert-warning" role="alert">
+                        Vui lòng kiểm tra lại thông tin:
+                        <ul> <li th:each="err : ${#fields.errors('customer.*')}" th:text="${err}" /> </ul>
+                    </div>
+
+                    <form th:action="@{/customers/edit/{id}(id=${customer.customerId})}" th:object="${customer}" method="post">
+                        <input type="hidden" th:field="*{customerId}" />
+                        <input type="hidden" th:field="*{status}" />
+
+                        <div class="mb-3">
+                            <label class="form-label" for="customerName">Tên khách hàng</label>
+                            <input type="text" class="form-control" id="customerName" th:field="*{customerName}" required="required" />
+                            <small class="text-danger" th:if="${#fields.hasErrors('customerName')}" th:errors="*{customerName}"></small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="customerPhone">Số điện thoại</label>
+                            <input type="tel" class="form-control" id="customerPhone"
+                                   th:field="*{customerPhone}" required="required"
+                                   pattern="[0-9]{10}" maxlength="10" title="Số điện thoại phải có đúng 10 chữ số." />
+                            <small class="text-danger" th:if="${#fields.hasErrors('customerPhone')}" th:errors="*{customerPhone}"></small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="customerEmail">Email</label>
+                            <input type="email" class="form-control" id="customerEmail"
+                                   th:field="*{customerEmail}" required="required" />
+                            <small class="text-danger" th:if="${#fields.hasErrors('customerEmail')}" th:errors="*{customerEmail}"></small>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="cardType">Loại thẻ</label>
+                                <select class="form-select" id="cardType" th:field="*{cardType}">
+                                    <option th:each="type : ${T(com.example.managebyclesystem.constants.CustomerCardType).values()}"
+                                            th:value="${type}" th:text="${#strings.capitalize(#strings.toLowerCase(type.name()))}"></option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="rewardPoints">Điểm thưởng</label>
+                                <input type="number" class="form-control" id="rewardPoints" th:field="*{rewardPoints}" min="0" />
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                        <a th:href="@{/customers}" class="btn btn-outline-secondary">Hủy</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<th:block layout:fragment="page_scripts"> </th:block>
+</body>
+</html>
