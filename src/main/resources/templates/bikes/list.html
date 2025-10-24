@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <title>Quản lý Xe đạp</title>
+    <th:block layout:fragment="page_css">
+        <link rel="stylesheet" th:href="@{/css/bicycle.css}"/>
+    </th:block>
+</head>
+<body>
+<div layout:fragment="content">
+    <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Quản lý /</span> Xe đạp</h4>
+
+    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong th:text="${successMessage}"></strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong th:text="${errorMessage}"></strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <form th:action="@{/bikes}" method="GET" class="mb-4">
+        <input type="hidden" name="page" value="0"/>
+        <input type="hidden" name="sortField" th:value="${sortField}"/>
+        <input type="hidden" name="sortDir" th:value="${sortDir}"/>
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+            <h5 class="mb-0">Danh sách Xe đạp</h5>
+            <div class="d-flex flex-wrap gap-3 align-items-center">
+                <div class="w-auto">
+                    <label for="filter-bike-type" class="visually-hidden">Lọc loại xe</label>
+                    <select id="filter-bike-type" name="type" class="form-select form-select-sm">
+                        <option value="">Tất cả loại xe</option>
+                        <option th:each="typeOpt : ${T(com.example.managebyclesystem.model.Bike.BikeType).values()}"
+                                th:value="${typeOpt}"
+                                th:text="${typeOpt.name() == 'NORMAL' ? 'Xe thường' : (typeOpt.name() == 'ELECTRIC' ? 'Xe điện' : 'Xe trẻ em')}"
+                                th:selected="${typeOpt == searchType}"> </option>
+                    </select>
+                </div>
+                <div class="input-group input-group-sm w-auto">
+                    <span class="input-group-text"><i class='bx bx-search'></i></span>
+                    <input type="text" name="name" class="form-control" placeholder="Tìm theo Tên xe..."
+                           th:value="${searchName}" aria-label="Tìm kiếm xe">
+                </div>
+                <button type="submit" class="btn btn-info btn-sm"><i class='bx bx-filter-alt'></i> Lọc/Tìm</button>
+                <a th:href="@{/bikes(page=${currentPage}, sortField=${sortField}, sortDir=${sortDir})}" class="btn btn-sm btn-outline-secondary" th:if="${searchName != null or searchType != null or searchLocation != null}">
+                    <i class='bx bx-x'></i> Xóa lọc
+                </a>
+                <a th:href="@{/bikes/add}" class="btn btn-primary btn-sm">
+                    <i class='bx bx-plus'></i> &nbsp; Thêm xe mới
+                </a>
+            </div>
+        </div>
+    </form>
+    <div id="bicycle-grid-container" class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-4">
+        <div th:if="${bikes == null or #lists.isEmpty(bikes)}" class="col-12">
+            <div class="empty-state">
+                <i class='bx bx-cycling'></i>
+                <p th:text="${searchName != null or searchType != null or searchLocation != null} ? 'Không tìm thấy xe phù hợp.' : 'Chưa có xe đạp nào.'"></p>
+                <a th:if="${searchName == null and searchType == null and searchLocation == null}" th:href="@{/bikes/add}" class="btn btn-sm btn-primary">Thêm chiếc xe đầu tiên</a>
+            </div>
+        </div>
+        <div class="col" th:each="bike : ${bikes}">
+            <div class="card h-100 bicycle-card">
+                <div class="bike-status-badge"
+                     th:classappend="${bike.bikeStatus?.name() == 'Available' ? 'bg-label-success' : (bike.bikeStatus?.name() == 'Unavailable' ? 'bg-label-danger' : (bike.bikeStatus?.name() == 'Maintenance' ? 'bg-label-info' : 'bg-label-secondary'))}"
+                     th:text="${bike.bikeStatus?.name() == 'Available' ? 'Có sẵn' : (bike.bikeStatus?.name() == 'Unavailable' ? 'Không có' : (bike.bikeStatus?.name() == 'Maintenance' ? 'Bảo trì' : 'N/A'))}">
+                </div>
+                <img class="card-img-top bicycle-card-img"
+                     th:src="${bike.bikeImage != null ? bike.bikeImage : '/img/default-bike.png'}"
+                     th:alt="${bike.bikeName}"
+                     onerror="this.onerror=null; this.src='/img/default-bike.png';"> <div class="card-body">
+                <h5 class="card-title" th:text="${bike.bikeName}">Bike Name</h5>
+                <p class="card-text text-muted small mb-2"
+                   th:text="${bike.bikeType?.name() == 'NORMAL' ? 'Xe thường' : (bike.bikeType?.name() == 'ELECTRIC' ? 'Xe điện' : (bike.bikeType?.name() == 'KID' ? 'Xe trẻ em' : 'Chưa rõ'))}">
+                    Bike Type
+                </p>
+                <p class="card-text fw-semibold text-primary mb-0"
+                   th:text="${#numbers.formatCurrency(bike.bikeRentPerHour)} + '/giờ'">
+                    Price/hour
+                </p>
+            </div>
+                <div class="card-footer bg-transparent border-0 d-flex justify-content-end gap-2 pb-3 px-3">
+                    <a th:href="@{/bikes/edit/{id}(id=${bike.bikeId})}"
+                       class="btn btn-sm btn-icon btn-outline-primary"
+                       data-bs-toggle="tooltip" title="Sửa">
+                        <i class="bx bx-edit-alt"></i>
+                    </a>
+                    <button class="btn btn-sm btn-icon btn-outline-danger btn-delete"
+                            th:data-id="${bike.bikeId}"
+                            th:data-name="${bike.bikeName}"
+                            data-bs-toggle="modal" data-bs-target="#deleteConfirmModal"
+                            data-bs-toggle-tooltip="tooltip" title="Xóa">
+                        <i class="bx bx-trash"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <nav class="mt-4" aria-label="Page navigation" th:if="${totalPages != null and totalPages > 1}">
+        <ul id="pagination" class="pagination justify-content-center">
+            <li class="page-item" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
+                <a class="page-link" th:href="@{/bikes(page=${currentPage - 1}, size=8, name=${searchName}, type=${searchType}, location=${searchLocation}, sortField=${sortField}, sortDir=${sortDir})}">&laquo;</a>
+            </li>
+            <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                th:classappend="${i == currentPage ? 'active' : ''}">
+                <a class="page-link" th:href="@{/bikes(page=${i}, size=8, name=${searchName}, type=${searchType}, location=${searchLocation}, sortField=${sortField}, sortDir=${sortDir})}" th:text="${i + 1}"></a>
+            </li>
+            <li class="page-item" th:classappend="${currentPage == (totalPages - 1) ? 'disabled' : ''}">
+                <a class="page-link" th:href="@{/bikes(page=${currentPage + 1}, size=8, name=${searchName}, type=${searchType}, location=${searchLocation}, sortField=${sortField}, sortDir=${sortDir})}">&raquo;</a>
+            </li>
+        </ul>
+    </nav>
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteConfirmModalLabel">Xác nhận Xóa</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="delete-form" th:action="@{/bikes/delete/0}" method="post"> <div class="modal-body">
+                    Bạn có chắc chắn muốn xóa (vô hiệu hóa) xe <strong id="bike-name-to-delete"></strong> không?
+                </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-danger" id="confirm-delete-btn">Xóa</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="page_scripts">
+    <script th:src="@{/js/bike_list.js}"></script>
+</th:block>
+</body>
+</html>
