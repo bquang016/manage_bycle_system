@@ -13,6 +13,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CustomerRepo extends JpaRepository<Customer, Integer> {
 
+
+    //cái này tên là findByStatus có nghĩa là truyền status là able vào thì nó sẽ hiển chị chỉ những thằng able thôi
     @Query("""
         SELECT c FROM Customer c
         WHERE c.status = :status
@@ -59,5 +61,15 @@ public interface CustomerRepo extends JpaRepository<Customer, Integer> {
     boolean existsByCustomerEmail(@Param("customerEmail") String customerEmail);
 
 
+    //cái này là nó truyền vào keyword thì để cho có thể tìm theo name, email, loại thẻ á
+    @Query("""
+    SELECT c FROM Customer c
+    WHERE 
+        (:keyword IS NULL OR LOWER(c.customerName) LIKE LOWER(CONCAT('%', :keyword, '%'))
+         OR LOWER(c.customerEmail) LIKE LOWER(CONCAT('%', :keyword, '%'))
+         OR LOWER(c.cardType) LIKE LOWER(CONCAT('%', :keyword, '%')))
+    AND 
+        (:status IS NULL OR c.status = :status)
+    """)
     Page<Customer> searchCustomers(@Param("keyword") String keyword, @Param("status") CustomerStatus status, Pageable pageable);
 }

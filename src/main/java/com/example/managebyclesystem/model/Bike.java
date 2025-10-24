@@ -28,6 +28,8 @@ public class Bike {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int bikeId;
 
+    // Ảnh xe — chỉ giữ 1 field
+    @Column(name = "bike_image")
     private String bikeImage;
 
     @Enumerated(EnumType.STRING)
