@@ -59,5 +59,13 @@ public interface CustomerRepo extends JpaRepository<Customer, Integer> {
     boolean existsByCustomerEmail(@Param("customerEmail") String customerEmail);
 
 
+    @Query("""
+        SELECT c FROM Customer c
+        WHERE c.status = :status AND (
+            LOWER(c.customerName) LIKE LOWER(concat('%', :keyword, '%')) OR
+            LOWER(c.customerEmail) LIKE LOWER(concat('%', :keyword, '%')) OR
+            (:keyword IS NULL OR :keyword = '' OR CAST(c.cardType AS string) LIKE UPPER(concat('%', :keyword, '%')))
+        )
+        """)
     Page<Customer> searchCustomers(@Param("keyword") String keyword, @Param("status") CustomerStatus status, Pageable pageable);
 }
