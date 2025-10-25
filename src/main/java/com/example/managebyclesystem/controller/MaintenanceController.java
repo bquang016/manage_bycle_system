@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -31,33 +32,49 @@ public class MaintenanceController {
     public String getMaintenanceCostAsc(@RequestParam(defaultValue = "0") int page, Model model){
         Page<Maintenance> maintenancePage = maintenanceService.getAllByOrderByMaintenanceCostAsc(page);
         addPaginationAttributes(model, maintenancePage, page);
-        return "maintenance/list";
+        return "maintenances/list";
     }
 
     @GetMapping("/costDesc")
     public String getMaintenanceCostDesc(@RequestParam(defaultValue = "0") int page, Model model){
         Page<Maintenance> maintenancePage = maintenanceService.getAllByOrderByMaintenanceCostDesc(page);
         addPaginationAttributes(model, maintenancePage, page);
-        return "maintenance/list";
+        return "maintenances/list";
     }
 
     @GetMapping("/dateAsc")
     public String getMaintenanceDateAsc(@RequestParam(defaultValue = "0") int page, Model model) {
         Page<Maintenance> maintenancePage = maintenanceService.getAllByOrderByMaitenanceDateAsc(page);
         addPaginationAttributes(model, maintenancePage, page);
-        return "maintenance/list";
+        return "maintenances/list";
 
     }
     @GetMapping("/dateDesc")
     public String getMaintenanceDateDesc(@RequestParam(defaultValue = "0") int page, Model model){
         Page<Maintenance> maintenancePage = maintenanceService.getAllByOrderByMaintenanceDateDesc(page);
         addPaginationAttributes(model, maintenancePage, page);
-        return "maintenance/list";
+        return "maintenances/list";
     }
 
     private void addPaginationAttributes(Model model, Page<Maintenance> maintenancePage, int page) {
         model.addAttribute("maintenance", maintenancePage.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", maintenancePage.getTotalPages());
+    }
+
+    @GetMapping("/add")
+    public String showAddForm(Model model){
+        model.addAttribute("maintenance", new Maintenance());
+        return "maintenances/add";
+    }
+    @GetMapping("/add")
+    public String addMaintenance(@ModelAttribute("maintenance") Maintenance maintenance, Model model){
+        try {
+            maintenanceService.addMaintenance(maintenance);
+            return "redirect:/maintenances";
+        }catch (IllegalArgumentException e){
+            model.addAttribute("errorMesage", e.getMessage());
+            return "maintenances/add";
+        }
     }
 }
