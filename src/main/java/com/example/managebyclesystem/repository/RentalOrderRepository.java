@@ -12,30 +12,24 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface RentalOrderRepository extends JpaRepository<RentalOrder, Integer> {
 
-    // Lấy danh sách đơn còn hoạt động
     @Query("""
         SELECT r FROM RentalOrder r
         WHERE r.rentalOrderActiveStatus = :status
     """)
     Page<RentalOrder> findByActiveStatus(@Param("status") ActiveStatus status, Pageable pageable);
 
-    // Sắp xếp theo ngày thuê tăng dần
     @Query("SELECT r FROM RentalOrder r ORDER BY r.rentalOrderRentalDate ASC")
     Page<RentalOrder> findAllByOrderByRentalDateAsc(Pageable pageable);
 
-    // Sắp xếp theo ngày thuê giảm dần
     @Query("SELECT r FROM RentalOrder r ORDER BY r.rentalOrderRentalDate DESC")
     Page<RentalOrder> findAllByOrderByRentalDateDesc(Pageable pageable);
 
-    // Sắp xếp theo tổng tiền tăng dần
     @Query("SELECT r FROM RentalOrder r ORDER BY r.rentalOrderTotalAmount ASC")
     Page<RentalOrder> findAllByOrderByTotalAmountAsc(Pageable pageable);
 
-    // Sắp xếp theo tổng tiền giảm dần
     @Query("SELECT r FROM RentalOrder r ORDER BY r.rentalOrderTotalAmount DESC")
     Page<RentalOrder> findAllByOrderByTotalAmountDesc(Pageable pageable);
 
-    // Tìm kiếm nâng cao
     @Query("""
         SELECT r FROM RentalOrder r
         WHERE (:customerId IS NULL OR LOWER(r.rentalOrderCustomerId) LIKE LOWER(CONCAT('%', :customerId, '%')))

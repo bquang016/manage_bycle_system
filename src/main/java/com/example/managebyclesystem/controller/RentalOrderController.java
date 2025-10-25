@@ -21,14 +21,12 @@ public class RentalOrderController {
         this.rentalOrderService = rentalOrderService;
     }
 
-    // ---------------- HELPER ----------------
     private void addPaginationAttributes(Model model, Page<RentalOrder> orderPage, int page) {
         model.addAttribute("orders", orderPage.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", orderPage.getTotalPages());
     }
 
-    // ---------------- LIST ALL ----------------
     @GetMapping
     public String getAllOrders(@RequestParam(defaultValue = "0") int page, Model model) {
         Page<RentalOrder> orderPage = rentalOrderService.getAllOrders(page, PAGE_SIZE);
@@ -36,7 +34,6 @@ public class RentalOrderController {
         return "rental_orders/list";
     }
 
-    // ---------------- SORTING ----------------
     @GetMapping("/dateAsc")
     public String getDateAsc(@RequestParam(defaultValue = "0") int page, Model model) {
         Page<RentalOrder> orderPage = rentalOrderService.getAllByOrderByRentalDateAsc(page, PAGE_SIZE);
@@ -63,5 +60,21 @@ public class RentalOrderController {
         Page<RentalOrder> orderPage = rentalOrderService.getAllByOrderByTotalAmountDesc(page, PAGE_SIZE);
         addPaginationAttributes(model, orderPage, page);
         return "rental_orders/list";
+    }
+    @GetMapping("/add")
+    public String showAddForm(Model model) {
+        model.addAttribute("rentalOrder", new RentalOrder());
+        return "rental_orders/add";
+    }
+
+    @PostMapping("/add")
+    public String addOrder(@ModelAttribute("rentalOrder") RentalOrder rentalOrder, Model model) {
+        try {
+            rentalOrderService.addRentalOrder(rentalOrder);
+            return "redirect:/rental-orders";
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("errorMessage", e.getMessage());
+            return "rental_orders/add";
+        }
     }
 }
