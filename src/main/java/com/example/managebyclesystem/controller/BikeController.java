@@ -117,7 +117,7 @@ public class BikeController {
         return "bikes/list";
     }
 
-    @GetMapping("/delete/{id}")
+    @PostMapping("/delete/{id}")
     public String disableBike(@PathVariable int id) {
         bikeService.disableBike(id);
         return "redirect:/bikes";
