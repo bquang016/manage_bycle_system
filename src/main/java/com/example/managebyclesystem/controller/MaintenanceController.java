@@ -99,5 +99,25 @@ public class MaintenanceController {
         return "redirect:/maintenances";
     }
 
+    @GetMapping("/search/bikeId")
+    public String searchByBikeId(@RequestParam String bikeId, @RequestParam(defaultValue = "0") int page, Model model) {
+        Page<Maintenance> maintenancePage = maintenanceService.getMaintenanceByBikeId(bikeId, page);
+        return prepareSearchModel(model, maintenancePage, page, "bikeId", bikeId);
+    }
+
+    @GetMapping("/search/date")
+    public String searchByDate(@RequestParam String date, @RequestParam(defaultValue = "0") int page, Model model) {
+        Page<Maintenance> maintenancePage = maintenanceService.getMaintenanceByDate(date, page);
+        return prepareSearchModel(model, maintenancePage, page, "date", date);
+    }
+
+    private String prepareSearchModel(Model model, Page<Maintenance> maintenancePage, int page, String searchType, String keyword) {
+        model.addAttribute("maintenances", maintenancePage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", maintenancePage.getTotalPages());
+        model.addAttribute("searchType", searchType);
+        model.addAttribute("keyword", keyword);
+        return "maintenances/list";
+    }
 
 }
