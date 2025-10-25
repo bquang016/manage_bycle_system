@@ -95,4 +95,18 @@ public class RentalOrderController {
             return "rental_orders/edit";
         }
     }
+    @GetMapping("/search")
+    public String searchOrders(@RequestParam(required = false) String customerId,
+                               @RequestParam(required = false) String bikeId,
+                               @RequestParam(required = false) RentalStatus status,
+                               @RequestParam(defaultValue = "0") int page,
+                               Model model) {
+        Page<RentalOrder> orderPage = rentalOrderService.searchOrders(customerId, bikeId, status, page, PAGE_SIZE);
+        addPaginationAttributes(model, orderPage, page);
+        model.addAttribute("searchCustomerId", customerId);
+        model.addAttribute("searchBikeId", bikeId);
+        model.addAttribute("searchStatus", status);
+        return "rental_orders/list";
+    }
+
 }
