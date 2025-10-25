@@ -25,9 +25,18 @@
                     <h4 class="mb-2 text-center">Chào mừng trở lại! 👋</h4>
                     <p class="mb-4 text-center">Vui lòng đăng nhập vào tài khoản của bạn</p>
 
-                    <div th:if="${errorMessage}" class="alert alert-danger" role="alert" th:text="${errorMessage}"></div>
-                    <div th:if="${logoutMessage}" class="alert alert-success" role="alert" th:text="${logoutMessage}"></div>
-                    <div th:if="${successMessage}" class="alert alert-success" role="alert" th:text="${successMessage}"></div>
+                    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <span th:text="${errorMessage}"></span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    <div th:if="${logoutMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+                        <span th:text="${logoutMessage}"></span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+                        <span th:text="${successMessage}"></span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
 
 
                     <form id="formAuthentication" class="mb-3" th:action="@{/login}" method="post">
@@ -62,7 +71,7 @@
 <script src="https://demos.themeselection.com/sneat-bootstrap-html-admin-template-free/assets/vendor/libs/popper/popper.js"></script>
 <script src="https://demos.themeselection.com/sneat-bootstrap-html-admin-template-free/assets/vendor/js/bootstrap.js"></script>
 <script>
-    // Simple password toggle (adjust selector if needed)
+    // Simple password toggle
     document.querySelectorAll('.form-password-toggle .input-group-text').forEach(item => {
         item.addEventListener('click', event => {
             const icon = item.querySelector('i');

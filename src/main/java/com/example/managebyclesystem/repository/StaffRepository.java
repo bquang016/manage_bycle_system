@@ -9,11 +9,14 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import java.util.Optional;
 
 import java.util.List;
 
 @Repository
 public interface StaffRepository extends JpaRepository<Staff, Integer> {
+    Optional<Staff> findByUsername(String username);
+
 
     List<Staff> findByStaffStatus(StaffStatus status);
 
@@ -32,4 +35,5 @@ public interface StaffRepository extends JpaRepository<Staff, Integer> {
     """)
     List<Staff> searchStaffs(@Param("keyword") String keyword,
                              @Param("position") StaffPosition position);
+
 }
