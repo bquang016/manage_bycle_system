@@ -6,10 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping("/maintenances")
@@ -77,4 +74,24 @@ public class MaintenanceController {
             return "maintenances/add";
         }
     }
+
+    @GetMapping("/edit/{id}")
+    public String showEditForm(@PathVariable int id, Model model){
+        Maintenance maintenance = maintenanceService.getMaintenanceById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy bảo trì id:"+id));
+        model.addAttribute("maintenance", maintenance);
+        return "maintenances/edit";
+    }
+    @PostMapping("/edit/{id}")
+    public String updateMaintenance(@PathVariable int id, @ModelAttribute("maintenace") Maintenance newMaintenace, Model model) {
+        try {
+            maintenanceService.updateMaintenance(id, newMaintenace);
+            return "redirect:/maintenances";
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("errorMessage", e.getMessage());
+            return "maintenances/edit";
+        }
+    }
+
+
 }

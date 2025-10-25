@@ -10,6 +10,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class MaintenanceService {
@@ -70,5 +72,56 @@ public class MaintenanceService {
         }
 
         return maintenanceRepo.save(maintenance);
+    }
+
+    public Optional<Maintenance> getMaintenanceById(int id){
+        return maintenanceRepo.findById(id);
+    }
+
+    public Maintenance updateMaintenance(int id, Maintenance newData) {
+        Maintenance existing = maintenanceRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy bảo trì có ID = " + id));
+
+        boolean changed = false;
+
+        if (newData.getBikeId() != null
+                && (existing.getBikeId() == null ||
+                existing.getBikeId().getBikeId() != newData.getBikeId().getBikeId())) {
+            existing.setBikeId(newData.getBikeId());
+            changed = true;
+        }
+
+        if (newData.getMaintenanceDesc() != null
+                && !Objects.equals(existing.getMaintenanceDesc(), newData.getMaintenanceDesc())) {
+            existing.setMaintenanceDesc(newData.getMaintenanceDesc());
+            changed = true;
+        }
+
+        if (newData.getMaintenanceDate() != null
+                && !Objects.equals(existing.getMaintenanceDate(), newData.getMaintenanceDate())) {
+
+            if (newData.getMaintenanceDate().isAfter(LocalDate.now())) {
+                throw new IllegalArgumentException("Ngày bảo trì không được nằm trong tương lai.");
+            }
+
+            existing.setMaintenanceDate(newData.getMaintenanceDate());
+            changed = true;
+        }
+
+        if (newData.getMaintenanceCost() >= 0
+                && existing.getMaintenanceCost() != newData.getMaintenanceCost()) {
+            existing.setMaintenanceCost(newData.getMaintenanceCost());
+            changed = true;
+        } else if (newData.getMaintenanceCost() < 0) {
+            throw new IllegalArgumentException("Chi phí bảo trì không được nhỏ hơn 0.");
+        }
+
+        if (newData.getMaintenanceStatus() != null
+                && !Objects.equals(existing.getMaintenanceStatus(), newData.getMaintenanceStatus())) {
+            existing.setMaintenanceStatus(newData.getMaintenanceStatus());
+            changed = true;
+        }
+
+        return changed ? maintenanceRepo.save(existing) : existing;
     }
 }
