@@ -124,4 +124,10 @@ public class MaintenanceService {
 
         return changed ? maintenanceRepo.save(existing) : existing;
     }
+
+    public void deleteMaintenance(int id){
+        Maintenance exsting = maintenanceRepo.findById(id).orElseThrow(()-> new RuntimeException("Không tìm thấy bảo trì có id: "+id));
+        exsting.setMaintenanceStatus(MaintenanceStatus.DISABLE);
+        maintenanceRepo.save(exsting);
+    }
 }
