@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="vi" class="light-style customizer-hide" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"/>
+    <title>Đăng nhập - Trang Quản lý</title>
+
+    <link rel="stylesheet" href="https://demos.themeselection.com/sneat-bootstrap-html-admin-template-free/assets/vendor/css/core.css" />
+    <link rel="stylesheet" href="https://demos.themeselection.com/sneat-bootstrap-html-admin-template-free/assets/vendor/css/theme-default.css" />
+    <link rel="stylesheet" href="https://demos.themeselection.com/sneat-bootstrap-html-admin-template-free/assets/css/demo.css" />
+    <link rel="stylesheet" href="https://demos.themeselection.com/sneat-bootstrap-html-admin-template-free/assets/vendor/css/pages/page-auth.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/boxicons/2.1.4/css/boxicons.min.css" />
+
+</head>
+<body>
+<div class="container-xxl">
+    <div class="authentication-wrapper authentication-basic container-p-y">
+        <div class="authentication-inner">
+            <div class="card">
+                <div class="card-body">
+                    <div class="app-brand justify-content-center mb-4">
+                        <a th:href="@{/}" class="app-brand-link gap-2">
+                            <img th:src="@{/img/logoxee.png}" alt="Logo" style="max-height: 50px;" /> </a>
+                    </div>
+                    <h4 class="mb-2 text-center">Chào mừng trở lại! 👋</h4>
+                    <p class="mb-4 text-center">Vui lòng đăng nhập vào tài khoản của bạn</p>
+
+                    <div th:if="${errorMessage}" class="alert alert-danger" role="alert" th:text="${errorMessage}"></div>
+                    <div th:if="${logoutMessage}" class="alert alert-success" role="alert" th:text="${logoutMessage}"></div>
+                    <div th:if="${successMessage}" class="alert alert-success" role="alert" th:text="${successMessage}"></div>
+
+
+                    <form id="formAuthentication" class="mb-3" th:action="@{/login}" method="post">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Tên đăng nhập</label> <input type="text" class="form-control" id="username" name="username" placeholder="Nhập tên đăng nhập" autofocus required/>
+                        </div>
+                        <div class="mb-3 form-password-toggle">
+                            <div class="d-flex justify-content-between">
+                                <label class="form-label" for="password">Mật khẩu</label>
+                            </div>
+                            <div class="input-group input-group-merge">
+                                <input type="password" id="password" class="form-control" name="password" placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" aria-describedby="password" required/>
+                                <span class="input-group-text cursor-pointer"><i class="bx bx-hide"></i></span>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <button class="btn btn-primary d-grid w-100" type="submit">Đăng nhập</button>
+                        </div>
+                    </form>
+
+                    <p class="text-center">
+                        <span>Chưa có tài khoản?</span>
+                        <a th:href="@{/register}"> <span>Tạo tài khoản mới</span>
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://demos.themeselection.com/sneat-bootstrap-html-admin-template-free/assets/vendor/libs/jquery/jquery.js"></script>
+<script src="https://demos.themeselection.com/sneat-bootstrap-html-admin-template-free/assets/vendor/libs/popper/popper.js"></script>
+<script src="https://demos.themeselection.com/sneat-bootstrap-html-admin-template-free/assets/vendor/js/bootstrap.js"></script>
+<script>
+    // Simple password toggle (adjust selector if needed)
+    document.querySelectorAll('.form-password-toggle .input-group-text').forEach(item => {
+        item.addEventListener('click', event => {
+            const icon = item.querySelector('i');
+            const input = item.previousElementSibling;
+            if (input && icon) {
+                if (input.type === "password") {
+                    input.type = "text";
+                    icon.classList.remove('bx-hide');
+                    icon.classList.add('bx-show');
+                } else {
+                    input.type = "password";
+                    icon.classList.remove('bx-show');
+                    icon.classList.add('bx-hide');
+                }
+            }
+        });
+    });
+</script>
+</body>
+</html>

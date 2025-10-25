@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="vi" class="light-style layout-menu-fixed"
       xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head>
     <meta charset="utf-8" />
@@ -119,7 +120,13 @@
                                 <li><a class="dropdown-item" href="#"><i class="bx bx-user me-2"></i><span class="align-middle">Hồ sơ</span></a></li>
                                 <li><a class="dropdown-item" href="#"><i class="bx bx-cog me-2"></i><span class="align-middle">Cài đặt</span></a></li>
                                 <li><div class="dropdown-divider"></div></li>
-                                <li><a class="dropdown-item" href="#"><i class="bx bx-power-off me-2"></i><span class="align-middle">Đăng xuất</span></a></li>
+                                <li>
+                                    <form th:action="@{/logout}" method="post" id="logoutForm" style="display: none;"></form>
+                                    <a class="dropdown-item" href="javascript:document.getElementById('logoutForm').submit();">
+                                        <i class="bx bx-power-off me-2"></i>
+                                        <span class="align-middle">Đăng xuất</span>
+                                    </a>
+                                </li>
                             </ul>
                         </li>
                     </ul>
