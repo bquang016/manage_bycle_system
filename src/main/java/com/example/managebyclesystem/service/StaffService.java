@@ -4,10 +4,14 @@ import com.example.managebyclesystem.model.Staff;
 import com.example.managebyclesystem.model.Staff.StaffPosition;
 import com.example.managebyclesystem.model.Staff.StaffShift;
 import com.example.managebyclesystem.model.Staff.StaffStatus;
+import com.example.managebyclesystem.model.StaffRole;
 import com.example.managebyclesystem.repository.StaffRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+
 
 import java.util.List;
 
@@ -15,51 +19,96 @@ import java.util.List;
 public class StaffService {
 
     private final StaffRepository staffRepository;
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Autowired
     public StaffService(StaffRepository staffRepository) {
         this.staffRepository = staffRepository;
     }
 
-    // thêm nv
     public void addStaff(Staff staff) {
-        if (staff.getStaffName() == null || staff.getStaffName().trim().isEmpty())
+        if (staff.getStaffName() == null || staff.getStaffName().trim().isEmpty()) {
             throw new IllegalArgumentException("Tên nhân viên không được để trống");
-        if (staff.getStaffSalary() <= 0)
-            throw new IllegalArgumentException("Lương phải lớn hơn 0");
-        if (staff.getStaffPosition() == null)
-            throw new IllegalArgumentException("Chức vụ không hợp lệ");
-        if (staff.getStaffShift() == null)
-            throw new IllegalArgumentException("Ca làm việc không hợp lệ");
+        }
 
+        if (staff.getUsername() == null || staff.getUsername().trim().isEmpty()) {
+            throw new IllegalArgumentException("Tên đăng nhập không được để trống");
+        }
+
+        if (staff.getPassword() == null || staff.getPassword().trim().isEmpty()) {
+            throw new IllegalArgumentException("Mật khẩu không được để trống");
+        }
+
+        if (staff.getStaffSalary() <= 0) {
+            throw new IllegalArgumentException("Lương phải lớn hơn 0");
+        }
+
+        if (staff.getStaffPosition() == null) {
+            throw new IllegalArgumentException("Chức vụ không hợp lệ");
+        }
+
+        if (staff.getStaffShift() == null) {
+            throw new IllegalArgumentException("Ca làm việc không hợp lệ");
+        }
+
+        // check uname
+        if (staffRepository.findAll().stream()
+                .anyMatch(s -> s.getUsername().equalsIgnoreCase(staff.getUsername()))) {
+            throw new IllegalArgumentException("Tên đăng nhập đã tồn tại");
+        }
+
+        // ma hoa mk
+        staff.setPassword(passwordEncoder.encode(staff.getPassword()));
+
+        // set mặc định
         staff.setStaffStatus(StaffStatus.Able);
+        if (staff.getRole() == null) {
+            staff.setRole(StaffRole.ROLE_USER);
+        }
+
         staffRepository.save(staff);
-        System.out.println("Thêm nhân viên: " + staff.getStaffName());
+        System.out.println("Thêm nhân viên thành công: " + staff.getStaffName());
     }
 
-    // find nv able
+    // list nv able
     public List<Staff> getAllActiveStaffs() {
         return staffRepository.findByStaffStatus(StaffStatus.Able);
     }
 
-    // find id forrm sửa
-    public Staff getStaffById(int staffId) {
-        return staffRepository.findById(staffId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy nhân viên với ID: " + staffId));
+
+    public Staff getStaffById(int id) {
+        return staffRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy nhân viên với ID: " + id));
     }
 
 
     public void updateStaff(Staff updatedStaff) {
         Staff existingStaff = getStaffById(updatedStaff.getStaffId());
 
-        if (existingStaff.getStaffStatus() == StaffStatus.Disable)
+        if (existingStaff.getStaffStatus() == StaffStatus.Disable) {
             throw new RuntimeException("Không thể sửa vì nhân viên là Disable.");
+        }
 
         existingStaff.setStaffName(updatedStaff.getStaffName().trim());
         existingStaff.setStaffPosition(updatedStaff.getStaffPosition());
         existingStaff.setStaffSalary(updatedStaff.getStaffSalary());
         existingStaff.setStaffShift(updatedStaff.getStaffShift());
-        existingStaff.setStaffRoles(updatedStaff.isStaffRoles());
+        existingStaff.setStaffStatus(updatedStaff.getStaffStatus());
+
+        // sua uname
+        if (updatedStaff.getUsername() != null && !updatedStaff.getUsername().trim().isEmpty()) {
+            existingStaff.setUsername(updatedStaff.getUsername().trim());
+        }
+
+        // sua mk
+        if (updatedStaff.getPassword() != null && !updatedStaff.getPassword().isBlank()) {
+            existingStaff.setPassword(passwordEncoder.encode(updatedStaff.getPassword()));
+        }
+
+        // sua role
+        if (updatedStaff.getRole() != null) {
+            existingStaff.setRole(updatedStaff.getRole());
+        }
 
         staffRepository.save(existingStaff);
         System.out.println("Cập nhật nhân viên thành công: " + existingStaff.getStaffName());
@@ -68,20 +117,23 @@ public class StaffService {
 
     public void deleteStaff(int staffId) {
         Staff staff = getStaffById(staffId);
-        // check disable
-        if (staff.getStaffStatus() == StaffStatus.Disable)
-            throw new RuntimeException("Nhân viên (ID=" + staffId + ") đã bị vô hiệu hóa.");
+        //check disable
+        if (staff.getStaffStatus() == StaffStatus.Disable) {
+            throw new RuntimeException("Nhân viên này đã bị vô hiệu hóa trước đó.");
+        }
 
         staff.setStaffStatus(StaffStatus.Disable);
         staffRepository.save(staff);
-        System.out.println("🗑️ Đã xóa nhân viên: " + staff.getStaffName());
+
+        System.out.println("Đã vô hiệu hóa nhân viên ID = " + staffId);
     }
 
-    // search
+
     public List<Staff> searchStaffs(String keyword, String position) {
         if ((keyword == null || keyword.trim().isEmpty()) &&
-                (position == null || position.trim().isEmpty()))
+                (position == null || position.trim().isEmpty())) {
             throw new IllegalArgumentException("Vui lòng nhập tên hoặc chức vụ.");
+        }
 
         String formattedKeyword = "%" + keyword.trim().toLowerCase() + "%";
         StaffPosition staffPosition = null;
@@ -106,6 +158,7 @@ public class StaffService {
                 : Sort.by(sortField).descending();
 
         Pageable pageable = PageRequest.of(pageIndex, pageSize, sort);
+
         return staffRepository.findByStaffStatusNot(StaffStatus.Disable, pageable);
     }
 }

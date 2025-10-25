@@ -1,6 +1,7 @@
 package com.example.managebyclesystem.controller;
 
 import com.example.managebyclesystem.model.Staff;
+import com.example.managebyclesystem.model.StaffRole;
 import com.example.managebyclesystem.service.StaffService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -44,6 +45,7 @@ public class StaffController {
     @GetMapping("/add")
     public String showAddForm(Model model) {
         model.addAttribute("staff", new Staff());
+        model.addAttribute("roles", StaffRole.values()); // chọn role
         return "staffs/add";
     }
 
@@ -53,9 +55,10 @@ public class StaffController {
         try {
             staffService.addStaff(staff);
             model.addAttribute("message", "Thêm nhân viên thành công!");
-            return "redirect:/staffs"; // quay lại danh sách
+            return "redirect:/staffs";
         } catch (Exception e) {
             model.addAttribute("error", e.getMessage());
+            model.addAttribute("roles", StaffRole.values());
             return "staffs/add";
         }
     }
@@ -65,34 +68,36 @@ public class StaffController {
     public String showEditForm(@PathVariable("id") int id, Model model) {
         Staff staff = staffService.getStaffById(id);
         model.addAttribute("staff", staff);
+        model.addAttribute("roles", StaffRole.values()); //  chọn role
         return "staffs/edit";
     }
 
 
     @PostMapping("/edit/{id}")
-    public String updateStaff(@ModelAttribute Staff staff, Model model) {
+    public String updateStaff(@PathVariable int id, @ModelAttribute("staff") Staff staff, Model model) {
         try {
+            staff.setStaffId(id);
             staffService.updateStaff(staff);
             model.addAttribute("message", "Cập nhật nhân viên thành công!");
             return "redirect:/staffs";
         } catch (Exception e) {
             model.addAttribute("error", e.getMessage());
+            model.addAttribute("roles", StaffRole.values());
             return "staffs/edit";
         }
     }
 
 
-    @PostMapping("/delete/{id}")
+    @GetMapping("/delete/{id}")
     public String deleteStaff(@PathVariable("id") int id, Model model) {
         try {
             staffService.deleteStaff(id);
-            model.addAttribute("message", "Xóa nhân viên thành công!");
+            model.addAttribute("message", "Vô hiệu hóa nhân viên thành công!");
         } catch (Exception e) {
             model.addAttribute("error", e.getMessage());
         }
         return "redirect:/staffs";
     }
-
 
 
     @GetMapping("/search")
