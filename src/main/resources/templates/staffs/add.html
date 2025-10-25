@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <title>Thêm Nhân viên mới</title>
+    <th:block layout:fragment="page_css">
+        <link rel="stylesheet" th:href="@{/css/staff.css}" />
+    </th:block>
+</head>
+<body>
+<div layout:fragment="content">
+    <h4 class="fw-bold py-3 mb-4">
+        <span class="text-muted fw-light">Quản lý Nhân viên /</span> Thêm mới
+    </h4>
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Thông tin nhân viên mới</h5>
+                    <a th:href="@{/staffs}" class="btn btn-sm btn-outline-secondary"><i class='bx bx-arrow-back'></i> Quay lại</a>
+                </div>
+                <div class="card-body">
+                    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert"> <strong th:text="${errorMessage}">Lỗi!</strong> <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button> </div>
+                    <div th:if="${#fields.hasErrors('staff.*')}" class="alert alert-warning" role="alert"> Vui lòng kiểm tra lại thông tin: <ul> <li th:each="err : ${#fields.errors('staff.*')}" th:text="${err}" /> </ul> </div>
+
+                    <form th:action="@{/staffs/add}" th:object="${staff}" method="post">
+                        <div class="mb-3">
+                            <label class="form-label" for="staffName">Họ và Tên</label>
+                            <input type="text" class="form-control" id="staffName" placeholder="Nhập họ tên" th:field="*{staffName}" required="required" />
+                            <small class="text-danger" th:if="${#fields.hasErrors('staffName')}" th:errors="*{staffName}"></small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="username">Tên đăng nhập</label>
+                            <input type="text" class="form-control" id="username" placeholder="Nhập tên đăng nhập" th:field="*{username}" required="required" />
+                            <small class="text-danger" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></small>
+                        </div>
+                        <div class="mb-3 form-password-toggle">
+                            <label class="form-label" for="password">Mật khẩu</label>
+                            <div class="input-group input-group-merge">
+                                <input type="password" id="password" class="form-control" placeholder="Nhập mật khẩu" th:field="*{password}" required="required"/>
+                                <span class="input-group-text cursor-pointer"><i class="bx bx-hide"></i></span>
+                            </div>
+                            <small class="text-danger" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></small>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="staffPosition">Chức vụ</label>
+                                <select class="form-select" id="staffPosition" th:field="*{staffPosition}" required="required">
+                                    <option value="">-- Chọn chức vụ --</option>
+                                    <option th:each="pos : ${T(com.example.managebyclesystem.model.Staff.StaffPosition).values()}"
+                                            th:value="${pos}" th:text="${pos}"></option>
+                                </select>
+                                <small class="text-danger" th:if="${#fields.hasErrors('staffPosition')}" th:errors="*{staffPosition}"></small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="staffSalary">Lương (VND)</label>
+                                <input type="number" class="form-control" id="staffSalary" placeholder="Nhập lương" th:field="*{staffSalary}" required="required" min="0" step="100000" />
+                                <small class="text-danger" th:if="${#fields.hasErrors('staffSalary')}" th:errors="*{staffSalary}"></small>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="staffShift">Ca làm việc</label>
+                                <select class="form-select" id="staffShift" th:field="*{staffShift}" required="required">
+                                    <option value="">-- Chọn ca --</option>
+                                    <option th:each="shift : ${T(com.example.managebyclesystem.model.Staff.StaffShift).values()}"
+                                            th:value="${shift}" th:text="${shift}"></option>
+                                </select>
+                                <small class="text-danger" th:if="${#fields.hasErrors('staffShift')}" th:errors="*{staffShift}"></small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="role">Vai trò</label>
+                                <select class="form-select" id="role" th:field="*{role}" required="required">
+                                    <option th:each="r : ${T(com.example.managebyclesystem.model.StaffRole).values()}"
+                                            th:value="${r}" th:text="${#strings.replace(r.name(), 'ROLE_', '')}"></option>
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Thêm nhân viên</button>
+                        <a th:href="@{/staffs}" class="btn btn-outline-secondary">Hủy</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="page_scripts">
+    <script>
+        document.querySelectorAll('.form-password-toggle .input-group-text').forEach(item => {
+            item.addEventListener('click', event => {
+                const icon = item.querySelector('i');
+                const input = item.previousElementSibling;
+                if (input && icon) {
+                    if (input.type === "password") {
+                        input.type = "text";
+                        icon.classList.remove('bx-hide');
+                        icon.classList.add('bx-show');
+                    } else {
+                        input.type = "password";
+                        icon.classList.remove('bx-show');
+                        icon.classList.add('bx-hide');
+                    }
+                }
+            });
+        });
+    </script>
+</th:block>
+</body>
+</html>
