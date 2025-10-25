@@ -130,4 +130,15 @@ public class MaintenanceService {
         exsting.setMaintenanceStatus(MaintenanceStatus.DISABLE);
         maintenanceRepo.save(exsting);
     }
+
+    public Page<Maintenance> getMaintenanceByBikeId(String keyword, int page) {
+        Pageable pageable = PageRequest.of(page, PAGE_SIZE);
+        return maintenanceRepo.searchMaintenances(keyword, MaintenanceStatus.ABLE, pageable);
+    }
+
+    public Page<Maintenance> getMaintenanceByDate(String keyword, int page) {
+        Pageable pageable = PageRequest.of(page, PAGE_SIZE);
+        return maintenanceRepo.searchMaintenances(keyword, MaintenanceStatus.ABLE, pageable);
+
+    }
 }
