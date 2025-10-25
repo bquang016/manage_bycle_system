@@ -101,31 +101,19 @@ public class CustomerController {
     }
 
     @GetMapping("/search/name")
-    public String searchByName(
-            @RequestParam String name,
-            @RequestParam(defaultValue = "0") int page,
-            Model model
-    ) {
+    public String searchByName(@RequestParam String name, @RequestParam(defaultValue = "0") int page, Model model) {
         Page<Customer> customerPage = customerService.getCustomerByName(name, page);
         return prepareSearchModel(model, customerPage, page, "name", name);
     }
 
     @GetMapping("/search/email")
-    public String searchByEmail(
-            @RequestParam String email,
-            @RequestParam(defaultValue = "0") int page,
-            Model model
-    ) {
+    public String searchByEmail(@RequestParam String email, @RequestParam(defaultValue = "0") int page, Model model) {
         Page<Customer> customerPage = customerService.getCustomerByEmail(email, page);
         return prepareSearchModel(model, customerPage, page, "email", email);
     }
 
     @GetMapping("/search/cardType")
-    public String searchByCardType(
-            @RequestParam String cardType,
-            @RequestParam(defaultValue = "0") int page,
-            Model model
-    ) {
+    public String searchByCardType(@RequestParam String cardType, @RequestParam(defaultValue = "0") int page, Model model) {
         Page<Customer> customerPage = customerService.getCustomerByCardType(cardType, page);
         return prepareSearchModel(model, customerPage, page, "cardType", cardType);
     }

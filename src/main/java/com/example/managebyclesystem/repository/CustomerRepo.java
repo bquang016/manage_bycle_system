@@ -64,11 +64,11 @@ public interface CustomerRepo extends JpaRepository<Customer, Integer> {
     //cái này là nó truyền vào keyword thì để cho có thể tìm theo name, email, loại thẻ á
     @Query("""
     SELECT c FROM Customer c
-    WHERE 
+    WHERE
         (:keyword IS NULL OR LOWER(c.customerName) LIKE LOWER(CONCAT('%', :keyword, '%'))
          OR LOWER(c.customerEmail) LIKE LOWER(CONCAT('%', :keyword, '%'))
          OR LOWER(c.cardType) LIKE LOWER(CONCAT('%', :keyword, '%')))
-    AND 
+    AND
         (:status IS NULL OR c.status = :status)
     """)
     Page<Customer> searchCustomers(@Param("keyword") String keyword, @Param("status") CustomerStatus status, Pageable pageable);
