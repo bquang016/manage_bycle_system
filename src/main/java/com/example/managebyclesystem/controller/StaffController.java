@@ -69,7 +69,7 @@ public class StaffController {
     }
 
 
-    @PostMapping("/update")
+    @PostMapping("/edit/{id}")
     public String updateStaff(@ModelAttribute Staff staff, Model model) {
         try {
             staffService.updateStaff(staff);
