@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <title>Quản lý Nhân viên</title>
+    <th:block layout:fragment="page_css">
+        <link rel="stylesheet" th:href="@{/css/staff.css}" /> </th:block>
+</head>
+<body>
+<div layout:fragment="content">
+    <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Quản lý /</span> Nhân viên</h4>
+
+    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert"> <strong th:text="${successMessage}"></strong> <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button> </div>
+    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert"> <strong th:text="${errorMessage}"></strong> <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button> </div>
+    <div th:if="${message}" class="alert alert-info alert-dismissible fade show" role="alert"> <strong th:text="${message}"></strong> <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button> </div>
+
+
+    <div class="card">
+        <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-3">
+            <h5 class="mb-0">Danh sách Nhân viên</h5>
+            <div class="d-flex flex-wrap gap-3 align-items-center">
+                <form th:action="@{/staffs}" method="GET" class="d-flex gap-2 align-items-center">
+                    <input type="hidden" name="pageNo" value="1"/> <input type="hidden" name="sortField" th:value="${sortField}"/>
+                    <input type="hidden" name="sortDir" th:value="${sortDir}"/>
+
+                    <select name="position" class="form-select form-select-sm" style="width: auto;">
+                        <option value="">Tất cả chức vụ</option>
+                        <option th:each="pos : ${T(com.example.managebyclesystem.model.Staff.StaffPosition).values()}"
+                                th:value="${pos.name()}" th:text="${pos}"
+                                th:selected="${#strings.equals(pos.name(), searchPosition)}"></option>
+                    </select>
+                    <input type="text" name="keyword" class="form-control form-control-sm" placeholder="Tìm theo Tên..." th:value="${searchKeyword}" style="width: auto;">
+                    <button type="submit" class="btn btn-sm btn-info"><i class='bx bx-search'></i> Tìm</button>
+                    <a th:href="@{/staffs(pageNo=${currentPage}, sortField=${sortField}, sortDir=${sortDir})}" class="btn btn-sm btn-outline-secondary" th:if="${searchKeyword != null or searchPosition != null}">
+                        <i class='bx bx-x'></i> Xóa tìm
+                    </a>
+                </form>
+                <a th:href="@{/staffs/add}" class="btn btn-primary btn-sm">
+                    <i class='bx bx-plus'></i> &nbsp; Thêm nhân viên
+                </a>
+            </div>
+        </div>
+        <div class="table-responsive text-nowrap">
+            <table class="table table-hover table-striped">
+                <thead>
+                <tr>
+                    <th>
+                        <a th:href="@{/staffs(pageNo=${currentPage}, pageSize=10, sortField='staffName', sortDir=${sortField == 'staffName' and sortDir == 'asc' ? 'desc' : 'asc'}, keyword=${searchKeyword}, position=${searchPosition})}">
+                            Nhân viên <i th:class="${sortField == 'staffName' ? (sortDir == 'asc' ? 'bx bx-sort-up' : 'bx bx-sort-down') : 'bx bx-sort'}"></i>
+                        </a>
+                    </th>
+                    <th>Chức vụ</th>
+                    <th>
+                        <a th:href="@{/staffs(pageNo=${currentPage}, pageSize=10, sortField='staffSalary', sortDir=${sortField == 'staffSalary' and sortDir == 'asc' ? 'desc' : 'asc'}, keyword=${searchKeyword}, position=${searchPosition})}">
+                            Lương <i th:class="${sortField == 'staffSalary' ? (sortDir == 'asc' ? 'bx bx-sort-up' : 'bx bx-sort-down') : 'bx bx-sort'}"></i>
+                        </a>
+                    </th>
+                    <th>Ca làm việc</th>
+                    <th>Vai trò</th> <th>Trạng thái</th>
+                    <th>Hành động</th>
+                </tr>
+                </thead>
+                <tbody id="staff-table-body" class="table-border-bottom-0">
+                <tr th:if="${#lists.isEmpty(staffs)}">
+                    <td colspan="7"> <div class="empty-state">
+                        <i class='bx bxs-user-detail'></i>
+                        <p th:text="${searchKeyword != null or searchPosition != null} ? 'Không tìm thấy nhân viên phù hợp.' : 'Chưa có nhân viên nào.'"></p>
+                        <a th:if="${searchKeyword == null and searchPosition == null}" th:href="@{/staffs/add}" class="btn btn-sm btn-primary">Thêm nhân viên đầu tiên</a>
+                    </div>
+                    </td>
+                </tr>
+                <tr th:each="staff : ${staffs}">
+                    <td>
+                        <div class="employee-info-cell"> <div class="avatar avatar-md flex-shrink-0 me-3">
+                            <img th:src="@{/img/default-avatar.png}" alt="Avatar" class="rounded-circle"/>
+                        </div>
+                            <div class="employee-details">
+                                <span class="employee-name" th:text="${staff.staffName}"></span>
+                                <small class="employee-position" th:text="${staff.username} ?: 'Chưa có username'"></small> </div>
+                        </div>
+                    </td>
+                    <td th:text="${staff.staffPosition} ?: '-'"></td>
+                    <td class="fw-semibold" th:text="${#numbers.formatCurrency(staff.staffSalary)}"></td>
+                    <td th:text="${staff.staffShift} ?: '-'"></td>
+                    <td>
+                        <span th:if="${staff.role != null}"
+                              th:text="${#strings.replace(staff.role.name(), 'ROLE_', '')}"
+                              th:classappend="${#strings.equals(staff.role.name(), 'ROLE_ADMIN') ? 'bg-label-primary' : 'bg-label-secondary'}"
+                              class="badge"></span>
+                        <span th:unless="${staff.role != null}">-</span>
+                    </td>
+                    <td>
+                         <span th:if="${staff.staffStatus != null}"
+                               th:text="${#strings.equals(staff.staffStatus.name(), 'Able') ? 'Hoạt động' : 'Vô hiệu hóa'}"
+                               th:classappend="${#strings.equals(staff.staffStatus.name(), 'Able') ? 'bg-label-success' : 'bg-label-danger'}"
+                               class="badge"></span>
+                        <span th:unless="${staff.staffStatus != null}">-</span>
+                    </td>
+                    <td>
+                        <div class="table-actions">
+                            <a th:href="@{/staffs/edit/{id}(id=${staff.staffId})}"
+                               class="btn btn-sm btn-icon btn-outline-primary"
+                               data-bs-toggle="tooltip" title="Sửa">
+                                <i class="bx bx-edit-alt"></i>
+                            </a>
+                            <button class="btn btn-sm btn-icon btn-outline-danger btn-delete"
+                                    th:data-id="${staff.staffId}"
+                                    th:data-name="${staff.staffName}"
+                                    data-bs-toggle="modal" data-bs-target="#deleteConfirmModal"
+                                    data-bs-toggle-tooltip="tooltip" title="Xóa (Vô hiệu hóa)">
+                                <i class="bx bx-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <nav class="mt-4" aria-label="Page navigation" th:if="${totalPages != null and totalPages > 1}">
+        <ul id="pagination" class="pagination justify-content-center">
+            <li class="page-item" th:classappend="${currentPage == 1 ? 'disabled' : ''}">
+                <a class="page-link" th:href="@{/staffs(pageNo=${currentPage - 1}, pageSize=10, sortField=${sortField}, sortDir=${sortDir}, keyword=${searchKeyword}, position=${searchPosition})}">&laquo;</a>
+            </li>
+            <li class="page-item" th:each="i : ${#numbers.sequence(1, totalPages)}"
+                th:classappend="${i == currentPage ? 'active' : ''}">
+                <a class="page-link" th:href="@{/staffs(pageNo=${i}, pageSize=10, sortField=${sortField}, sortDir=${sortDir}, keyword=${searchKeyword}, position=${searchPosition})}" th:text="${i}"></a>
+            </li>
+            <li class="page-item" th:classappend="${currentPage == totalPages ? 'disabled' : ''}">
+                <a class="page-link" th:href="@{/staffs(pageNo=${currentPage + 1}, pageSize=10, sortField=${sortField}, sortDir=${sortDir}, keyword=${searchKeyword}, position=${searchPosition})}">&raquo;</a>
+            </li>
+        </ul>
+    </nav>
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteConfirmModalLabel">Xác nhận Vô hiệu hóa</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="delete-form" th:action="@{/staffs/delete/0}" method="post"> <div class="modal-body">
+                    Bạn có chắc chắn muốn vô hiệu hóa nhân viên <strong id="staff-name-to-delete"></strong> không?
+                </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-danger" id="confirm-delete-btn">Vô hiệu hóa</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="page_scripts">
+    <script th:src="@{/js/staff_list.js}"></script> </th:block>
+</body>
+</html>
