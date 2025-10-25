@@ -94,4 +94,9 @@ public class RentalOrderService {
 
         rentalOrderRepository.save(existing);
     }
+    public Page<RentalOrder> searchOrders(String customerId, String bikeId, RentalStatus status, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return rentalOrderRepository.searchRentalOrders(customerId, bikeId, status, pageable);
+    }
+
 }
