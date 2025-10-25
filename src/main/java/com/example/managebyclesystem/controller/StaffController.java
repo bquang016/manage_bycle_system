@@ -82,7 +82,7 @@ public class StaffController {
     }
 
 
-    @GetMapping("/delete/{id}")
+    @PostMapping("/delete/{id}")
     public String deleteStaff(@PathVariable("id") int id, Model model) {
         try {
             staffService.deleteStaff(id);
@@ -92,6 +92,7 @@ public class StaffController {
         }
         return "redirect:/staffs";
     }
+
 
 
     @GetMapping("/search")
