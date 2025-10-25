@@ -108,5 +108,9 @@ public class RentalOrderController {
         model.addAttribute("searchStatus", status);
         return "rental_orders/list";
     }
-
+    @PostMapping("/delete/{id}")
+    public String disableOrder(@PathVariable int id) {
+        rentalOrderService.disableRentalOrder(id);
+        return "redirect:/rental-orders";
+    }
 }

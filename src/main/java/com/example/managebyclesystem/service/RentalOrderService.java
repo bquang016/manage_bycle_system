@@ -52,29 +52,6 @@ public class RentalOrderService {
         rentalOrderRepository.save(rentalOrder);
     }
 
-    private void validateRentalOrder(RentalOrder rentalOrder) {
-        if (rentalOrder.getRentalOrderCustomerId() == null || rentalOrder.getRentalOrderCustomerId().trim().isEmpty()) {
-            throw new IllegalArgumentException("Mã khách hàng không được để trống");
-        }
-        if (rentalOrder.getRentalOrderBikeId() == null || rentalOrder.getRentalOrderBikeId().trim().isEmpty()) {
-            throw new IllegalArgumentException("Mã xe không được để trống");
-        }
-        if (rentalOrder.getRentalOrderRentalDate() == null) {
-            throw new IllegalArgumentException("Ngày thuê không được để trống");
-        }
-        if (rentalOrder.getRentalOrderRentalTime() == null) {
-            throw new IllegalArgumentException("Giờ thuê không được để trống");
-        }
-
-        LocalDate date = rentalOrder.getRentalOrderRentalDate();
-        LocalTime time = rentalOrder.getRentalOrderRentalTime();
-        if (date.isAfter(LocalDate.now())) {
-            throw new IllegalArgumentException("Ngày thuê không được lớn hơn ngày hiện tại");
-        }
-        if (time.isAfter(LocalTime.now()) && date.equals(LocalDate.now())) {
-            throw new IllegalArgumentException("Giờ thuê không được lớn hơn thời gian hiện tại");
-        }
-    }
     public void updateRentalOrder(RentalOrder updatedRentalOrder) {
         if (updatedRentalOrder.getRentalOrderId() == 0) {
             throw new IllegalArgumentException("ID đơn thuê không hợp lệ để cập nhật");
@@ -98,5 +75,38 @@ public class RentalOrderService {
         Pageable pageable = PageRequest.of(page, size);
         return rentalOrderRepository.searchRentalOrders(customerId, bikeId, status, pageable);
     }
+    public void disableRentalOrder(int rentalOrderId) {
+        RentalOrder order = rentalOrderRepository.findById(rentalOrderId)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy đơn thuê có ID: " + rentalOrderId));
 
+        if (order.getRentalOrderActiveStatus() == ActiveStatus.DISABLE) {
+            throw new IllegalStateException("Đơn thuê này đã bị vô hiệu hóa trước đó.");
+        }
+
+        order.setRentalOrderActiveStatus(ActiveStatus.DISABLE);
+        rentalOrderRepository.save(order);
+    }
+    private void validateRentalOrder(RentalOrder rentalOrder) {
+        if (rentalOrder.getRentalOrderCustomerId() == null || rentalOrder.getRentalOrderCustomerId().trim().isEmpty()) {
+            throw new IllegalArgumentException("Mã khách hàng không được để trống");
+        }
+        if (rentalOrder.getRentalOrderBikeId() == null || rentalOrder.getRentalOrderBikeId().trim().isEmpty()) {
+            throw new IllegalArgumentException("Mã xe không được để trống");
+        }
+        if (rentalOrder.getRentalOrderRentalDate() == null) {
+            throw new IllegalArgumentException("Ngày thuê không được để trống");
+        }
+        if (rentalOrder.getRentalOrderRentalTime() == null) {
+            throw new IllegalArgumentException("Giờ thuê không được để trống");
+        }
+
+        LocalDate date = rentalOrder.getRentalOrderRentalDate();
+        LocalTime time = rentalOrder.getRentalOrderRentalTime();
+        if (date.isAfter(LocalDate.now())) {
+            throw new IllegalArgumentException("Ngày thuê không được lớn hơn ngày hiện tại");
+        }
+        if (time.isAfter(LocalTime.now()) && date.equals(LocalDate.now())) {
+            throw new IllegalArgumentException("Giờ thuê không được lớn hơn thời gian hiện tại");
+        }
+    }
 }
