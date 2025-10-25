@@ -43,4 +43,13 @@ public interface MaintenanceRepo extends JpaRepository<Maintenance, Integer> {
         ORDER BY m.maintenanceCost DESC
         """)
     Page<Maintenance> findAllByOrderByMaintenanceCostDesc(Pageable pageable);
+
+    @Query("""
+    SELECT m FROM Maintenance m
+    WHERE 
+        (CAST(m.bikeId.bikeId AS string) LIKE %:keyword%
+         OR CAST(m.maintenanceDate AS string) LIKE %:keyword%)
+        AND m.maintenaceStatus = :status
+    """)
+    Page<Maintenance> searchMaintenances(@Param("keyword") String keyword, @Param("status")MaintenanceStatus status, Pageable pageable);
 }

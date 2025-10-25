@@ -93,5 +93,11 @@ public class MaintenanceController {
         }
     }
 
+    @GetMapping("delete/{id}")
+    public String deleteMaintenance(@PathVariable int id){
+        maintenanceService.deleteMaintenance(id);
+        return "redirect:/maintenances";
+    }
+
 
 }
