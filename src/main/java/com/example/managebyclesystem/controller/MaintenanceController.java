@@ -27,6 +27,33 @@ public class MaintenanceController {
         addPaginationAttributes(model, maintenancePage, page);
         return "maintenances/list";
     }
+    @GetMapping("/costAsc")
+    public String getMaintenanceCostAsc(@RequestParam(defaultValue = "0") int page, Model model){
+        Page<Maintenance> maintenancePage = maintenanceService.getAllByOrderByMaintenanceCostAsc(page);
+        addPaginationAttributes(model, maintenancePage, page);
+        return "maintenance/list";
+    }
+
+    @GetMapping("/costDesc")
+    public String getMaintenanceCostDesc(@RequestParam(defaultValue = "0") int page, Model model){
+        Page<Maintenance> maintenancePage = maintenanceService.getAllByOrderByMaintenanceCostDesc(page);
+        addPaginationAttributes(model, maintenancePage, page);
+        return "maintenance/list";
+    }
+
+    @GetMapping("/dateAsc")
+    public String getMaintenanceDateAsc(@RequestParam(defaultValue = "0") int page, Model model) {
+        Page<Maintenance> maintenancePage = maintenanceService.getAllByOrderByMaitenanceDateAsc(page);
+        addPaginationAttributes(model, maintenancePage, page);
+        return "maintenance/list";
+
+    }
+    @GetMapping("/dateDesc")
+    public String getMaintenanceDateDesc(@RequestParam(defaultValue = "0") int page, Model model){
+        Page<Maintenance> maintenancePage = maintenanceService.getAllByOrderByMaintenanceDateDesc(page);
+        addPaginationAttributes(model, maintenancePage, page);
+        return "maintenance/list";
+    }
 
     private void addPaginationAttributes(Model model, Page<Maintenance> maintenancePage, int page) {
         model.addAttribute("maintenance", maintenancePage.getContent());

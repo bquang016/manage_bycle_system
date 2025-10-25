@@ -19,4 +19,28 @@ public interface MaintenanceRepo extends JpaRepository<Maintenance, Integer> {
         """)
     Page<Maintenance> findByStatus(@Param("status") MaintenanceStatus status, Pageable pageable);
 
+    @Query("""
+        SELECT m FROM Maintenance m
+        ORDER BY m.maintenanceDate ASC
+        """)
+    Page<Maintenance> findAllByOrderByMaintenanceDateAsc (Pageable pageable);
+
+    @Query("""
+        SELECT m FROM Maintenance m
+        ORDER BY m.maintenanceDate DESC
+        """)
+    Page<Maintenance> findAllByOrderByMaintenanceDateDesc(Pageable pageable);
+
+
+    @Query("""
+        SELECT m FROM Maintenance m
+        ORDER BY m.maintenanceCost ASC
+        """)
+    Page<Maintenance> findAllByOrderByMaintenanceCostAsc(Pageable pageable);
+
+    @Query("""
+        SELECT m FROM Maintenance m
+        ORDER BY m.maintenanceCost DESC
+        """)
+    Page<Maintenance> findAllByOrderByMaintenanceCostDesc(Pageable pageable);
 }
