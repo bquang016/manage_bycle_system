@@ -22,7 +22,6 @@ public class RentalOrderService {
         this.rentalOrderRepository = rentalOrderRepository;
     }
 
-    // ---------------- READ ----------------
     public Page<RentalOrder> getAllOrders(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return rentalOrderRepository.findByActiveStatus(ActiveStatus.ABLE, pageable);
@@ -32,7 +31,6 @@ public class RentalOrderService {
         return rentalOrderRepository.findById(id);
     }
 
-    // ---------------- SORT ----------------
     public Page<RentalOrder> getAllByOrderByRentalDateAsc(int page, int size) {
         return rentalOrderRepository.findAllByOrderByRentalDateAsc(PageRequest.of(page, size));
     }
@@ -47,5 +45,34 @@ public class RentalOrderService {
 
     public Page<RentalOrder> getAllByOrderByTotalAmountDesc(int page, int size) {
         return rentalOrderRepository.findAllByOrderByTotalAmountDesc(PageRequest.of(page, size));
+    }
+    public void addRentalOrder(RentalOrder rentalOrder) {
+        validateRentalOrder(rentalOrder);
+        rentalOrder.setRentalOrderActiveStatus(ActiveStatus.ABLE);
+        rentalOrderRepository.save(rentalOrder);
+    }
+
+    private void validateRentalOrder(RentalOrder rentalOrder) {
+        if (rentalOrder.getRentalOrderCustomerId() == null || rentalOrder.getRentalOrderCustomerId().trim().isEmpty()) {
+            throw new IllegalArgumentException("Mã khách hàng không được để trống");
+        }
+        if (rentalOrder.getRentalOrderBikeId() == null || rentalOrder.getRentalOrderBikeId().trim().isEmpty()) {
+            throw new IllegalArgumentException("Mã xe không được để trống");
+        }
+        if (rentalOrder.getRentalOrderRentalDate() == null) {
+            throw new IllegalArgumentException("Ngày thuê không được để trống");
+        }
+        if (rentalOrder.getRentalOrderRentalTime() == null) {
+            throw new IllegalArgumentException("Giờ thuê không được để trống");
+        }
+
+        LocalDate date = rentalOrder.getRentalOrderRentalDate();
+        LocalTime time = rentalOrder.getRentalOrderRentalTime();
+        if (date.isAfter(LocalDate.now())) {
+            throw new IllegalArgumentException("Ngày thuê không được lớn hơn ngày hiện tại");
+        }
+        if (time.isAfter(LocalTime.now()) && date.equals(LocalDate.now())) {
+            throw new IllegalArgumentException("Giờ thuê không được lớn hơn thời gian hiện tại");
+        }
     }
 }
