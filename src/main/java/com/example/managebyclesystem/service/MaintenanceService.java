@@ -9,6 +9,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+
 @Service
 public class MaintenanceService {
 
@@ -45,5 +47,28 @@ public class MaintenanceService {
     public Page<Maintenance> getAllByOrderByMaintenanceDateDesc(int page){
         Pageable pageable = PageRequest.of(page, PAGE_SIZE);
         return  maintenanceRepo.findAllByOrderByMaintenanceDateDesc(pageable);
+    }
+    public Maintenance addMaintenance(Maintenance maintenance) {
+        if (maintenance.getBikeId() == null) {
+            throw new IllegalArgumentException("Xe cần bảo trì không được để trống");
+        }
+
+        if (maintenance.getMaintenanceDesc() == null || maintenance.getMaintenanceDesc().trim().isEmpty()) {
+            throw new IllegalArgumentException("Mô tả bảo trì không được để trống");
+        }
+
+        if (maintenance.getMaintenanceDate() == null) {
+            throw new IllegalArgumentException("Ngày bảo trì không được để trống");
+        }
+
+        if (maintenance.getMaintenanceDate().isAfter(LocalDate.now())) {
+            throw new IllegalArgumentException("Ngày bảo trì không được nằm trong tương lai");
+        }
+
+        if (maintenance.getMaintenanceCost() < 0) {
+            throw new IllegalArgumentException("Chi phí bảo trì không được nhỏ hơn 0");
+        }
+
+        return maintenanceRepo.save(maintenance);
     }
 }
