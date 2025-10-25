@@ -77,4 +77,22 @@ public class RentalOrderController {
             return "rental_orders/add";
         }
     }
+    @GetMapping("/edit/{id}")
+    public String showUpdateForm(@PathVariable int id, Model model) {
+        RentalOrder rentalOrder = rentalOrderService.getOrderById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn thuê ID: " + id));
+        model.addAttribute("rentalOrder", rentalOrder);
+        return "rental_orders/edit";
+    }
+
+    @PostMapping("/edit")
+    public String updateOrder(@ModelAttribute("rentalOrder") RentalOrder rentalOrder, Model model) {
+        try {
+            rentalOrderService.updateRentalOrder(rentalOrder);
+            return "redirect:/rental-orders";
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("errorMessage", e.getMessage());
+            return "rental_orders/edit";
+        }
+    }
 }

@@ -75,4 +75,23 @@ public class RentalOrderService {
             throw new IllegalArgumentException("Giờ thuê không được lớn hơn thời gian hiện tại");
         }
     }
+    public void updateRentalOrder(RentalOrder updatedRentalOrder) {
+        if (updatedRentalOrder.getRentalOrderId() == 0) {
+            throw new IllegalArgumentException("ID đơn thuê không hợp lệ để cập nhật");
+        }
+
+        RentalOrder existing = rentalOrderRepository.findById(updatedRentalOrder.getRentalOrderId())
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy đơn thuê có ID: " + updatedRentalOrder.getRentalOrderId()));
+
+        validateRentalOrder(updatedRentalOrder);
+
+        existing.setRentalOrderCustomerId(updatedRentalOrder.getRentalOrderCustomerId().trim());
+        existing.setRentalOrderBikeId(updatedRentalOrder.getRentalOrderBikeId().trim());
+        existing.setRentalOrderRentalDate(updatedRentalOrder.getRentalOrderRentalDate());
+        existing.setRentalOrderRentalTime(updatedRentalOrder.getRentalOrderRentalTime());
+        existing.setRentalOrderTotalAmount(updatedRentalOrder.getRentalOrderTotalAmount());
+        existing.setRentalOrderStatus(updatedRentalOrder.getRentalOrderStatus());
+
+        rentalOrderRepository.save(existing);
+    }
 }
