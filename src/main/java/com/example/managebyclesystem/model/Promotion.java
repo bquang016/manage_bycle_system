@@ -30,6 +30,16 @@ public class Promotion {
 
     }
 
+    public Promotion(String promotionName, PromotionType promotionType, double promotionDiscount,
+                     LocalDate promotionStartDate, LocalDate promotionEndDate, PromotionStatus promotionStatus) {
+        this.promotionName = promotionName;
+        this.promotionType = promotionType;
+        this.promotionDiscount = promotionDiscount;
+        this.promotionStartDate = promotionStartDate;
+        this.promotionEndDate = promotionEndDate;
+        this.promotionStatus = promotionStatus;
+    }
+
     // Getters & Setters
     public int getPromotionId() {
         return promotionId;

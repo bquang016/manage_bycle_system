@@ -2,6 +2,7 @@ package com.example.managebyclesystem.service;
 
 
 import com.example.managebyclesystem.constants.PromotionStatus;
+import com.example.managebyclesystem.constants.PromotionType;
 import com.example.managebyclesystem.model.Customer;
 import com.example.managebyclesystem.model.Promotion;
 import com.example.managebyclesystem.repository.PromotionRepo;
@@ -159,6 +160,33 @@ public class PromotionService {
     public Page<Promotion> getPromotionByType(String type, int page){
         Pageable pageable = PageRequest.of(page, PAGE_SIZE);
         return promotionRepo.searchPromotions(type, PromotionStatus.ABLE, pageable);
+    }
+
+    public double applyPromotion(int promotionId, double originalPrice) {
+        Promotion promotion = promotionRepo.findById(promotionId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy khuyến mãi với ID: " + promotionId));
+
+        LocalDate now = LocalDate.now();
+        if (promotion.getPromotionStatus() != PromotionStatus.ABLE) {
+            throw new IllegalArgumentException("Khuyến mãi không khả dụng");
+        }
+        if (promotion.getPromotionStartDate().isAfter(now) || promotion.getPromotionEndDate().isBefore(now)) {
+            throw new IllegalArgumentException("Khuyến mãi chưa bắt đầu hoặc đã hết hạn");
+        }
+
+        double discountedPrice;
+
+        if (promotion.getPromotionType() == PromotionType.PERCENTAGE) {
+            discountedPrice = originalPrice - (originalPrice * promotion.getPromotionDiscount() / 100);
+        } else if (promotion.getPromotionType() == PromotionType.FIXED_AMOUNT) {
+            discountedPrice = originalPrice - promotion.getPromotionDiscount();
+        } else {
+            discountedPrice = originalPrice;
+        }
+
+        if (discountedPrice < 0) discountedPrice = 0;
+
+        return discountedPrice;
     }
 
 }

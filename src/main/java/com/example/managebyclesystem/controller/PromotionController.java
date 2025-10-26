@@ -133,6 +133,30 @@ public class PromotionController {
         return "promotions/list";
     }
 
+    @GetMapping("/apply")
+    public String showApplyPromotionForm() {
+        return "promotions/apply";
+    }
 
+    @PostMapping("/apply")
+    public String applyPromotion(@RequestParam("promotionId") int promotionId, @RequestParam("price") double price, Model model) {
+        try {
+            double finalPrice = promotionService.applyPromotion(promotionId, price);
+
+            model.addAttribute("promotionId", promotionId);
+            model.addAttribute("originalPrice", price);
+            model.addAttribute("finalPrice", finalPrice);
+            model.addAttribute("message", "Áp dụng khuyến mãi thành công!");
+
+            return "promotions/result";
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("error", e.getMessage());
+            return "promotions/error";
+        } catch (Exception e) {
+            model.addAttribute("error", "Có lỗi xảy ra: " + e.getMessage());
+            return "promotions/error";
+        }
+
+    }
 
 }
