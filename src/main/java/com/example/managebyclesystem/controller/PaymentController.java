@@ -40,12 +40,6 @@ public class PaymentController {
         }
     }
 
-    // lst ale
-    @GetMapping
-    public String listPayments(Model model) {
-        model.addAttribute("payments", paymentService.getAllActivePayments());
-        return "payments/list";
-    }
 
 
     @PostMapping("/delete/{id}")
