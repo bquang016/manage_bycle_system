@@ -25,33 +25,46 @@ public class MaintenanceController {
         addPaginationAttributes(model, maintenancePage, page);
         return "maintenances/list";
     }
-    @GetMapping("/costAsc")
-    public String getMaintenanceCostAsc(@RequestParam(defaultValue = "0") int page, Model model){
-        Page<Maintenance> maintenancePage = maintenanceService.getAllByOrderByMaintenanceCostAsc(page);
+    @GetMapping("/sort/cost")
+    public String getMaintenanceSortedByCost(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "asc") String order,
+            Model model
+    ) {
+        Page<Maintenance> maintenancePage;
+
+        if ("desc".equalsIgnoreCase(order)) {
+            maintenancePage = maintenanceService.getAllByOrderByMaintenanceCostDesc(page);
+        } else {
+            maintenancePage = maintenanceService.getAllByOrderByMaintenanceCostAsc(page);
+        }
+
         addPaginationAttributes(model, maintenancePage, page);
+
+
         return "maintenances/list";
     }
 
-    @GetMapping("/costDesc")
-    public String getMaintenanceCostDesc(@RequestParam(defaultValue = "0") int page, Model model){
-        Page<Maintenance> maintenancePage = maintenanceService.getAllByOrderByMaintenanceCostDesc(page);
+
+    @GetMapping("/sort/date")
+    public String getMaintenanceSortedByDate(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "asc") String order,
+            Model model
+    ) {
+        Page<Maintenance> maintenancePage;
+
+        if ("desc".equalsIgnoreCase(order)) {
+            maintenancePage = maintenanceService.getAllByOrderByMaintenanceDateDesc(page);
+        } else {
+            maintenancePage = maintenanceService.getAllByOrderByMaitenanceDateAsc(page);
+        }
+
         addPaginationAttributes(model, maintenancePage, page);
+
         return "maintenances/list";
     }
 
-    @GetMapping("/dateAsc")
-    public String getMaintenanceDateAsc(@RequestParam(defaultValue = "0") int page, Model model) {
-        Page<Maintenance> maintenancePage = maintenanceService.getAllByOrderByMaitenanceDateAsc(page);
-        addPaginationAttributes(model, maintenancePage, page);
-        return "maintenances/list";
-
-    }
-    @GetMapping("/dateDesc")
-    public String getMaintenanceDateDesc(@RequestParam(defaultValue = "0") int page, Model model){
-        Page<Maintenance> maintenancePage = maintenanceService.getAllByOrderByMaintenanceDateDesc(page);
-        addPaginationAttributes(model, maintenancePage, page);
-        return "maintenances/list";
-    }
 
     private void addPaginationAttributes(Model model, Page<Maintenance> maintenancePage, int page) {
         model.addAttribute("maintenance", maintenancePage.getContent());
