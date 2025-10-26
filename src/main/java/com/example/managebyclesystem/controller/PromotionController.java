@@ -29,6 +29,8 @@ public class PromotionController {
         return "promotions/list";
     }
 
+
+
     private void addPaginationAtttributes(Model model, Page<Promotion> promotionPage, int page){
         model.addAttribute("promotions", promotionPage.getContent());
         model.addAttribute("currentPage",page);

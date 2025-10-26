@@ -23,28 +23,32 @@ public interface CustomerRepo extends JpaRepository<Customer, Integer> {
 
     @Query("""
         SELECT c FROM Customer c
+        WHERE c.status = :status
         ORDER BY c.customerName ASC
         """)
-    Page<Customer> findAllByOrderByCustomerNameAsc(Pageable pageable);
+    Page<Customer> findAllByOrderByCustomerNameAsc(@Param("status") CustomerStatus status,Pageable pageable);
 
     @Query("""
         SELECT c FROM Customer c
+        WHERE c.status = :status
         ORDER BY c.customerName DESC
         """)
-    Page<Customer> findAllByOrderByCustomerNameDesc(Pageable pageable);
+    Page<Customer> findAllByOrderByCustomerNameDesc(@Param("status") CustomerStatus status,Pageable pageable);
 
 
     @Query("""
         SELECT c FROM Customer c
+        WHERE c.status = :status
         ORDER BY c.rewardPoints ASC
         """)
-    Page<Customer> findAllByOrderByRewardPointsAsc(Pageable pageable);
+    Page<Customer> findAllByOrderByRewardPointsAsc(@Param("status") CustomerStatus status,Pageable pageable);
 
     @Query("""
         SELECT c FROM Customer c
+        WHERE c.status = :status
         ORDER BY c.rewardPoints DESC
         """)
-    Page<Customer> findAllByOrderByRewardPointsDesc(Pageable pageable);
+    Page<Customer> findAllByOrderByRewardPointsDesc(@Param("status") CustomerStatus status,Pageable pageable);
 
     @Query("""
         SELECT CASE WHEN COUNT(c) > 0 THEN TRUE ELSE FALSE END
