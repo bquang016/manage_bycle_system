@@ -10,6 +10,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+
 @Service
 public class PromotionService {
 
@@ -45,5 +47,42 @@ public class PromotionService {
     public Page<Promotion> getAllOrderByDiscountDesc(int page){
         Pageable pageable = PageRequest.of(page, PAGE_SIZE);
         return  promotionRepo.findAllByOrderPromotionDiscountDesc(PromotionStatus.ABLE,pageable);
+    }
+
+
+
+    public Promotion addPromotion(Promotion promotion) {
+        if (promotion.getPromotionName() == null || promotion.getPromotionName().trim().isEmpty()) {
+            throw new IllegalArgumentException("Tên khuyến mãi không được để trống");
+        }
+
+        if (promotion.getPromotionType() == null) {
+            throw new IllegalArgumentException("Loại khuyến mãi không được để trống");
+        }
+
+        if (promotion.getPromotionStartDate() == null) {
+            throw new IllegalArgumentException("Ngày bắt đầu khuyến mãi không được để trống");
+        }
+
+        if (promotion.getPromotionEndDate() == null) {
+            throw new IllegalArgumentException("Ngày kết thúc khuyến mãi không được để trống");
+        }
+
+        if (promotion.getPromotionDiscount() < 0) {
+            throw new IllegalArgumentException("Giảm giá phải lớn hơn hoặc bằng 0%");
+        }
+        if (promotion.getPromotionDiscount() > 100) {
+            throw new IllegalArgumentException("Giảm giá không được vượt quá 100%");
+        }
+
+        LocalDate now = LocalDate.now();
+        if (promotion.getPromotionEndDate().isBefore(promotion.getPromotionStartDate())) {
+            throw new IllegalArgumentException("Ngày kết thúc không được nhỏ hơn ngày bắt đầu");
+        }
+        if (promotion.getPromotionEndDate().isBefore(now)) {
+            throw new IllegalArgumentException("Ngày kết thúc không được nằm trong quá khứ");
+        }
+
+        return promotionRepo.save(promotion);
     }
 }
