@@ -36,4 +36,12 @@ public class PaymentController {
             return "payments/add";
         }
     }
+
+    // lst ale
+    @GetMapping
+    public String listPayments(Model model) {
+        model.addAttribute("payments", paymentService.getAllActivePayments());
+        return "payments/list";
+    }
+
 }
