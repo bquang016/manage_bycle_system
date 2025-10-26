@@ -2,6 +2,7 @@ package com.example.managebyclesystem.service;
 
 
 import com.example.managebyclesystem.constants.PromotionStatus;
+import com.example.managebyclesystem.model.Customer;
 import com.example.managebyclesystem.model.Promotion;
 import com.example.managebyclesystem.repository.PromotionRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class PromotionService {
@@ -85,4 +88,62 @@ public class PromotionService {
 
         return promotionRepo.save(promotion);
     }
+
+    public Optional<Promotion> getPromotionById(int id) {
+        return promotionRepo.findById(id);
+    }
+
+
+    public Promotion updatePromotion(int id, Promotion newPromotionData) {
+        Promotion existing = promotionRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy khuyến mãi có id: " + id));
+
+        boolean changed = false;
+
+        if (newPromotionData.getPromotionName() != null
+                && !Objects.equals(existing.getPromotionName(), newPromotionData.getPromotionName())) {
+            existing.setPromotionName(newPromotionData.getPromotionName());
+            changed = true;
+        }
+
+        if (newPromotionData.getPromotionType() != null
+                && !Objects.equals(existing.getPromotionType(), newPromotionData.getPromotionType())) {
+            existing.setPromotionType(newPromotionData.getPromotionType());
+            changed = true;
+        }
+
+        if (newPromotionData.getPromotionDiscount() != existing.getPromotionDiscount()) {
+            if (newPromotionData.getPromotionDiscount() < 0 || newPromotionData.getPromotionDiscount() > 100) {
+                throw new IllegalArgumentException("Giảm giá phải nằm trong khoảng 0% đến 100%");
+            }
+            existing.setPromotionDiscount(newPromotionData.getPromotionDiscount());
+            changed = true;
+        }
+
+        if (newPromotionData.getPromotionStartDate() != null
+                && !Objects.equals(existing.getPromotionStartDate(), newPromotionData.getPromotionStartDate())) {
+            if (newPromotionData.getPromotionEndDate() != null &&
+                    newPromotionData.getPromotionEndDate().isBefore(newPromotionData.getPromotionStartDate())) {
+                throw new IllegalArgumentException("Ngày bắt đầu không được sau ngày kết thúc");
+            }
+            existing.setPromotionStartDate(newPromotionData.getPromotionStartDate());
+            changed = true;
+        }
+
+        if (newPromotionData.getPromotionEndDate() != null
+                && !Objects.equals(existing.getPromotionEndDate(), newPromotionData.getPromotionEndDate())) {
+            if (newPromotionData.getPromotionStartDate() != null &&
+                    newPromotionData.getPromotionEndDate().isBefore(newPromotionData.getPromotionStartDate())) {
+                throw new IllegalArgumentException("Ngày kết thúc không được trước ngày bắt đầu");
+            }
+            if (newPromotionData.getPromotionEndDate().isBefore(LocalDate.now())) {
+                throw new IllegalArgumentException("Ngày kết thúc không được nằm trong quá khứ");
+            }
+            existing.setPromotionEndDate(newPromotionData.getPromotionEndDate());
+            changed = true;
+        }
+
+        return changed ? promotionRepo.save(existing) : existing;
+    }
+
 }
