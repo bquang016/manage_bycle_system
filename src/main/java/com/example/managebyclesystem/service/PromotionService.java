@@ -26,4 +26,24 @@ public class PromotionService {
         Pageable pageable = PageRequest.of(page, PAGE_SIZE);
         return promotionRepo.findByStatus(PromotionStatus.ABLE, pageable);
     }
+
+    public Page<Promotion> getAllOrderByNameAsc(int page){
+        Pageable pageable = PageRequest.of(page, PAGE_SIZE);
+        return promotionRepo.findAllByOrderByPromotionNameAsc(PromotionStatus.ABLE,pageable);
+    }
+
+    public Page<Promotion> getAllOrderByNameDesc(int page){
+        Pageable pageable = PageRequest.of(page, PAGE_SIZE);
+        return promotionRepo.findAllByOrderByPromotionNameDesc(PromotionStatus.ABLE,pageable);
+    }
+
+    public Page<Promotion> getAllOrderByDiscountAsc(int page){
+        Pageable pageable = PageRequest.of(page, PAGE_SIZE);
+        return promotionRepo.findAllByOrderByPromotionDiscountAsc(PromotionStatus.ABLE,pageable);
+    }
+
+    public Page<Promotion> getAllOrderByDiscountDesc(int page){
+        Pageable pageable = PageRequest.of(page, PAGE_SIZE);
+        return  promotionRepo.findAllByOrderPromotionDiscountDesc(PromotionStatus.ABLE,pageable);
+    }
 }

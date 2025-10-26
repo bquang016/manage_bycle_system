@@ -29,22 +29,22 @@ public class CustomerService {
     }
     public Page<Customer> getAllByOrderByNameAsc(int page) {
         Pageable pageable = PageRequest.of(page, PAGE_SIZE);
-        return customerRepo.findAllByOrderByCustomerNameAsc(pageable);
+        return customerRepo.findAllByOrderByCustomerNameAsc(CustomerStatus.ABLE,pageable);
     }
 
     public Page<Customer> getAllByOrderByNameDesc(int page) {
         Pageable pageable = PageRequest.of(page, PAGE_SIZE);
-        return customerRepo.findAllByOrderByCustomerNameDesc(pageable);
+        return customerRepo.findAllByOrderByCustomerNameDesc(CustomerStatus.ABLE,pageable);
     }
 
     public Page<Customer> getAllByOrderByRewardPointAsc(int page) {
         Pageable pageable = PageRequest.of(page, PAGE_SIZE);
-        return customerRepo.findAllByOrderByRewardPointsAsc(pageable);
+        return customerRepo.findAllByOrderByRewardPointsAsc(CustomerStatus.ABLE,pageable);
     }
 
     public Page<Customer> getAllByOrderByRewardPointDesc(int page) {
         Pageable pageable = PageRequest.of(page, PAGE_SIZE);
-        return customerRepo.findAllByOrderByRewardPointsDesc(pageable);
+        return customerRepo.findAllByOrderByRewardPointsDesc(CustomerStatus.ABLE,pageable);
     }
 
     public Customer addCustomer(Customer customer) {
