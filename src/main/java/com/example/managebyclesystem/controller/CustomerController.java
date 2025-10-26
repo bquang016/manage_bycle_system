@@ -26,33 +26,43 @@ public class CustomerController {
         return "customers/list";
     }
 
-    @GetMapping("/nameAsc")
-    public String getCustomersNameAsc(@RequestParam(defaultValue = "0") int page, Model model) {
-        Page<Customer> customerPage = customerService.getAllByOrderByNameAsc(page);
+    @GetMapping("/sort/name")
+    public String getCustomersSortedByName(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "asc") String order,
+            Model model
+    ) {
+        Page<Customer> customerPage;
+
+        if ("desc".equalsIgnoreCase(order)) {
+            customerPage = customerService.getAllByOrderByNameDesc(page);
+        } else {
+            customerPage = customerService.getAllByOrderByNameAsc(page);
+        }
+
         addPaginationAttributes(model, customerPage, page);
         return "customers/list";
     }
 
-    @GetMapping("/nameDesc")
-    public String getCustomersNameDesc(@RequestParam(defaultValue = "0") int page, Model model) {
-        Page<Customer> customerPage = customerService.getAllByOrderByNameDesc(page);
+
+    @GetMapping("/sort/point")
+    public String getCustomersSortedByPoint(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "asc") String order,
+            Model model
+    ) {
+        Page<Customer> customerPage;
+
+        if ("desc".equalsIgnoreCase(order)) {
+            customerPage = customerService.getAllByOrderByRewardPointDesc(page);
+        } else {
+            customerPage = customerService.getAllByOrderByRewardPointAsc(page);
+        }
+
         addPaginationAttributes(model, customerPage, page);
         return "customers/list";
     }
 
-    @GetMapping("/pointAsc")
-    public String getCustomersPointAsc(@RequestParam(defaultValue = "0") int page, Model model) {
-        Page<Customer> customerPage = customerService.getAllByOrderByRewardPointAsc(page);
-        addPaginationAttributes(model, customerPage, page);
-        return "customers/list";
-    }
-
-    @GetMapping("/pointDesc")
-    public String getCustomersPointDesc(@RequestParam(defaultValue = "0") int page, Model model) {
-        Page<Customer> customerPage = customerService.getAllByOrderByRewardPointDesc(page);
-        addPaginationAttributes(model, customerPage, page);
-        return "customers/list";
-    }
 
     private void addPaginationAttributes(Model model, Page<Customer> customerPage, int page) {
         //lấy danh sách khách hanng ở trang hiện tại
