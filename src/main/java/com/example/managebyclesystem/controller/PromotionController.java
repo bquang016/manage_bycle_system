@@ -23,9 +23,35 @@ public class PromotionController {
     }
 
     @GetMapping
-    public String getAllPromotion(@RequestParam(defaultValue = "0") int page, Model model){
+    public String getAllPromotions(@RequestParam(defaultValue = "0") int page, Model model){
         Page<Promotion> promotionsPage = promotionService.getAllPromotion(page);
         addPaginationAtttributes(model, promotionsPage, page);
+        return "promotions/list";
+    }
+
+    @GetMapping
+    public String getPromotionsNameAsc(@RequestParam(defaultValue = "0") int page, Model model){
+        Page<Promotion> promotionPage = promotionService.getAllOrderByNameAsc(page);
+        addPaginationAtttributes(model, promotionPage, page);
+        return "promotions/list";
+    }
+    @GetMapping
+    public String getPromotionsNameDesc(@RequestParam(defaultValue = "0") int page, Model model){
+        Page<Promotion> promotionPage = promotionService.getAllOrderByNameDesc(page);
+        addPaginationAtttributes(model, promotionPage, page);
+        return "promotions/list";
+    }
+
+    @GetMapping
+    public String getPromotionsDiscountAsc(@RequestParam(defaultValue = "0") int page, Model model){
+        Page<Promotion> promotionPage = promotionService.getAllOrderByDiscountAsc(page);
+        addPaginationAtttributes(model, promotionPage, page);
+        return "promotions/list";
+    }
+    @GetMapping
+    public String getPromotionsDiscountDesc(@RequestParam(defaultValue = "0") int page, Model model){
+        Page<Promotion> promotionPage = promotionService.getAllOrderByDiscountDesc(page);
+        addPaginationAtttributes(model, promotionPage, page);
         return "promotions/list";
     }
 
