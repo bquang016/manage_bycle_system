@@ -59,12 +59,12 @@ public class MaintenanceController {
         model.addAttribute("totalPages", maintenancePage.getTotalPages());
     }
 
-    @PostMapping("/add")
+    @GetMapping("/add")
     public String showAddForm(Model model){
         model.addAttribute("maintenance", new Maintenance());
         return "maintenances/add";
     }
-    @GetMapping("/add")
+    @PostMapping("/add")
     public String addMaintenance(@ModelAttribute("maintenance") Maintenance maintenance, Model model){
         try {
             maintenanceService.addMaintenance(maintenance);
