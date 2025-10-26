@@ -99,5 +99,11 @@ public class PromotionController {
         }
     }
 
+    @GetMapping("delete/{id}")
+    public String deletePromotion(@PathVariable int id){
+        promotionService.deletePromotion(id);
+        return "redirect:/promotions";
+    }
+
 
 }

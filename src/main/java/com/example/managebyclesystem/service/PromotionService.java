@@ -146,4 +146,10 @@ public class PromotionService {
         return changed ? promotionRepo.save(existing) : existing;
     }
 
+    public void deletePromotion(int id){
+        Promotion existing = promotionRepo.findById(id).orElseThrow(() -> new RuntimeException("Không tìm thấy promotion có id: "+id));
+        existing.setPromotionStatus(PromotionStatus.DISABLE);
+        promotionRepo.save(existing);
+    }
+
 }
