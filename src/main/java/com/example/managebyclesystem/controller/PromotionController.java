@@ -1,6 +1,5 @@
 package com.example.managebyclesystem.controller;
 
-import com.example.managebyclesystem.model.Customer;
 import com.example.managebyclesystem.model.Promotion;
 import com.example.managebyclesystem.service.PromotionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,4 +78,26 @@ public class PromotionController {
         }
 
     }
+
+    @GetMapping("/edit/{id}")
+    public String showEditForm(@PathVariable int id, Model model) {
+        Promotion promotion = promotionService.getPromotionById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy khách hàng id: " + id));
+        model.addAttribute("promotion", promotion);
+        return "promotions/edit";
+    }
+
+
+    @PostMapping("/edit/{id}")
+    public String updatePromotion(@PathVariable int id, @ModelAttribute("promotion") Promotion newPromotion, Model model) {
+        try {
+            promotionService.updatePromotion(id, newPromotion);
+            return "redirect:/promotions";
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("errorMessage", e.getMessage());
+            return "promotions/edit";
+        }
+    }
+
+
 }
