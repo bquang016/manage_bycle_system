@@ -117,13 +117,7 @@ public class CustomerController {
         Page<Customer> customerPage = customerService.getCustomerByCardType(cardType, page);
         return prepareSearchModel(model, customerPage, page, "cardType", cardType);
     }
-    private String prepareSearchModel(
-            Model model,
-            Page<Customer> customerPage,
-            int page,
-            String searchType,
-            String keyword
-    ) {
+    private String prepareSearchModel(Model model, Page<Customer> customerPage, int page, String searchType, String keyword) {
         model.addAttribute("customers", customerPage.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", customerPage.getTotalPages());
