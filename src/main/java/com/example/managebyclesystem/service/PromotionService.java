@@ -63,9 +63,8 @@ public class PromotionService {
             throw new IllegalArgumentException("Loại khuyến mãi không được để trống");
         }
 
-        if (promotion.getPromotionStartDate() == null) {
-            throw new IllegalArgumentException("Ngày bắt đầu khuyến mãi không được để trống");
-        }
+        LocalDate today = LocalDate.now();
+        promotion.setPromotionStartDate(today);
 
         if (promotion.getPromotionEndDate() == null) {
             throw new IllegalArgumentException("Ngày kết thúc khuyến mãi không được để trống");
