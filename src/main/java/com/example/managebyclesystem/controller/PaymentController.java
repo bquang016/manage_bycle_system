@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Page;
+
 
 @Controller
 @RequestMapping("/payments")
@@ -94,6 +96,28 @@ public class PaymentController {
 
         model.addAttribute("rentalOrderId", rentalOrderId);
         model.addAttribute("selectedMethod", paymentMethod);
+
+        return "payments/list";
+    }
+
+
+    // phân trang + sort
+    @GetMapping
+    public String listPayments(
+            @RequestParam(defaultValue = "1") int pageNo,
+            @RequestParam(defaultValue = "10") int pageSize,
+            @RequestParam(defaultValue = "paymentDate") String sortField,
+            @RequestParam(defaultValue = "asc") String sortDir,
+            Model model
+    ) {
+        Page<Payment> paymentPage = paymentService.getPaginatedAndSortedPayments(pageNo, pageSize, sortField, sortDir);
+
+        model.addAttribute("payments", paymentPage.getContent());
+        model.addAttribute("currentPage", pageNo);
+        model.addAttribute("totalPages", paymentPage.getTotalPages());
+        model.addAttribute("sortField", sortField);
+        model.addAttribute("sortDir", sortDir);
+        model.addAttribute("reverseSortDir", sortDir.equals("asc") ? "desc" : "asc");
 
         return "payments/list";
     }
