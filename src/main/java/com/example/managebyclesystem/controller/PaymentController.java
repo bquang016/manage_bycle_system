@@ -56,5 +56,25 @@ public class PaymentController {
         return "redirect:/payments";
     }
 
+    @GetMapping("/edit/{id}")
+    public String showEditForm(@PathVariable int id, Model model) {
+        Payment payment = paymentService.getPaymentById(id);
+        model.addAttribute("payment", payment);
+        return "payments/edit";
+    }
+
+
+    @PostMapping("/edit")
+    public String updatePayment(@ModelAttribute("payment") Payment updatedPayment, Model model) {
+        try {
+            paymentService.updatePayment(updatedPayment);
+            return "redirect:/payments";
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("error", e.getMessage());
+            return "payments/edit";
+        }
+    }
+
+
 
 }

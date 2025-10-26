@@ -75,5 +75,47 @@ public class PaymentService {
         System.out.println("Đã vô hiệu hóa thanh toán ID = " + paymentId);
     }
 
+    // lay id cho sua
+    public Payment getPaymentById(int id) {
+        return paymentRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy thanh toán có ID: " + id));
+    }
+
+
+    public void updatePayment(Payment updatedPayment) {
+        Payment existingPayment = paymentRepository.findById(updatedPayment.getPaymentId())
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy thanh toán có ID: " + updatedPayment.getPaymentId()));
+
+        // check đơn
+        if (updatedPayment.getRentalOrder() == null || updatedPayment.getRentalOrder().getRentalOrderId() == 0) {
+            throw new IllegalArgumentException("Vui lòng nhập mã đơn thuê hợp lệ.");
+        }
+
+        RentalOrder rentalOrder = rentalOrderRepository.findById(updatedPayment.getRentalOrder().getRentalOrderId())
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy đơn thuê với ID: "
+                        + updatedPayment.getRentalOrder().getRentalOrderId()));
+        // check dis
+        if (rentalOrder.getRentalOrderActiveStatus() == ActiveStatus.DISABLE) {
+            throw new IllegalArgumentException("Đơn thuê này đã bị vô hiệu hóa. Không thể cập nhật thanh toán.");
+        }
+
+        if (updatedPayment.getPaymentAmount() <= 0) {
+            throw new IllegalArgumentException("Số tiền thanh toán phải lớn hơn 0.");
+        }
+
+        if (updatedPayment.getPaymentMethod() == null) {
+            throw new IllegalArgumentException("Phương thức thanh toán không được để trống.");
+        }
+
+
+        existingPayment.setRentalOrder(rentalOrder);
+        existingPayment.setPaymentMethod(updatedPayment.getPaymentMethod());
+        existingPayment.setPaymentAmount(updatedPayment.getPaymentAmount());
+        existingPayment.setPaymentStatus(updatedPayment.getPaymentStatus());
+
+        paymentRepository.save(existingPayment);
+        System.out.println("Cập nhật thanh toán thành công cho đơn thuê ID: " + rentalOrder.getRentalOrderId());
+    }
+
 
 }
