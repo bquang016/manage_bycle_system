@@ -49,6 +49,8 @@ public class PromotionService {
         return  promotionRepo.findAllByOrderPromotionDiscountDesc(PromotionStatus.ABLE,pageable);
     }
 
+
+
     public Promotion addPromotion(Promotion promotion) {
         if (promotion.getPromotionName() == null || promotion.getPromotionName().trim().isEmpty()) {
             throw new IllegalArgumentException("Tên khuyến mãi không được để trống");
