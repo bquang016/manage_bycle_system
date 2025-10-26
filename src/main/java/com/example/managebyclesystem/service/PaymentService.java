@@ -1,6 +1,7 @@
 package com.example.managebyclesystem.service;
 
 import com.example.managebyclesystem.model.Payment;
+import com.example.managebyclesystem.model.Payment.PaymentMethod;
 import com.example.managebyclesystem.model.Payment.PaymentStatus;
 import com.example.managebyclesystem.model.RentalOrder;
 import com.example.managebyclesystem.model.RentalOrder.ActiveStatus;
@@ -8,6 +9,7 @@ import com.example.managebyclesystem.repository.PaymentRepository;
 import com.example.managebyclesystem.repository.RentalOrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 
 @Service
@@ -115,6 +117,14 @@ public class PaymentService {
 
         paymentRepository.save(existingPayment);
         System.out.println("Cập nhật thanh toán thành công cho đơn thuê ID: " + rentalOrder.getRentalOrderId());
+    }
+
+    // tìm
+    public List<Payment> searchPayments(Integer rentalOrderId, PaymentMethod paymentMethod) {
+        if ((rentalOrderId == null || rentalOrderId == 0) && paymentMethod == null) {
+            throw new IllegalArgumentException("Vui lòng nhập mã đơn thuê hoặc chọn phương thức thanh toán.");
+        }
+        return paymentRepository.searchPayments(rentalOrderId, paymentMethod);
     }
 
 

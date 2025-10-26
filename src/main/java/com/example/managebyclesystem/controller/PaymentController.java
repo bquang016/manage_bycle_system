@@ -1,6 +1,7 @@
 package com.example.managebyclesystem.controller;
 
 import com.example.managebyclesystem.model.Payment;
+import com.example.managebyclesystem.model.Payment.PaymentMethod;
 import com.example.managebyclesystem.service.PaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -76,5 +77,24 @@ public class PaymentController {
     }
 
 
+    @GetMapping("/search")
+    public String searchPayments(
+            @RequestParam(required = false) Integer rentalOrderId,
+            @RequestParam(required = false) PaymentMethod paymentMethod,
+            Model model
+    ) {
+        try {
+            var results = paymentService.searchPayments(rentalOrderId, paymentMethod);
+            model.addAttribute("payments", results);
+            model.addAttribute("message", "Tìm thấy " + results.size() + " kết quả.");
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("error", e.getMessage());
+            model.addAttribute("payments", paymentService.getAllActivePayments());
+        }
 
+        model.addAttribute("rentalOrderId", rentalOrderId);
+        model.addAttribute("selectedMethod", paymentMethod);
+
+        return "payments/list";
+    }
 }
