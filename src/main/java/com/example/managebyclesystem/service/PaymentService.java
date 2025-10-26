@@ -60,4 +60,20 @@ public class PaymentService {
         return paymentRepository.findByPaymentStatus(Payment.PaymentStatus.Able);
     }
 
+    // xóa
+    public void deletePayment(int paymentId) {
+        Payment payment = paymentRepository.findById(paymentId)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy thanh toán với ID: " + paymentId));
+        // check disable
+        if (payment.getPaymentStatus() == Payment.PaymentStatus.Disable) {
+            throw new IllegalArgumentException("Thanh toán đã bị vô hiệu hóa trước đó.");
+        }
+        // set disable
+        payment.setPaymentStatus(Payment.PaymentStatus.Disable);
+        paymentRepository.save(payment);
+
+        System.out.println("Đã vô hiệu hóa thanh toán ID = " + paymentId);
+    }
+
+
 }

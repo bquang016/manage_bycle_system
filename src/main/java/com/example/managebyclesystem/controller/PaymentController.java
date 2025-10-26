@@ -44,4 +44,17 @@ public class PaymentController {
         return "payments/list";
     }
 
+
+    @PostMapping("/delete/{id}")
+    public String deletePayment(@PathVariable("id") int id, Model model) {
+        try {
+            paymentService.deletePayment(id);
+            model.addAttribute("message", "Vô hiệu hóa thanh toán thành công!");
+        } catch (Exception e) {
+            model.addAttribute("error", e.getMessage());
+        }
+        return "redirect:/payments";
+    }
+
+
 }
