@@ -105,5 +105,27 @@ public class PromotionController {
         return "redirect:/promotions";
     }
 
+    @GetMapping("/search/name")
+    public String searchByName(@RequestParam String name, @RequestParam(defaultValue = "0") int page, Model model){
+        Page<Promotion> promotionPage = promotionService.getPromotionByName(name, page);
+        return prepareSearchModel(model, promotionPage, page,"name", name);
+    }
+
+    @GetMapping("/search/type")
+    public String searchByType(@RequestParam String type, @RequestParam(defaultValue = "0") int page, Model model){
+        Page<Promotion> promotionPage = promotionService.getPromotionByType(type, page);
+        return prepareSearchModel(model, promotionPage, page,"type", type);
+    }
+
+    private String prepareSearchModel(Model model, Page<Promotion> promotionPage, int page, String searchType, String keyword) {
+        model.addAttribute("promotions", promotionPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", promotionPage.getTotalPages());
+        model.addAttribute("searchType", searchType);
+        model.addAttribute("keyword", keyword);
+        return "promotions/list"; // View trả về: templates/promotions/list.html
+    }
+
+
 
 }

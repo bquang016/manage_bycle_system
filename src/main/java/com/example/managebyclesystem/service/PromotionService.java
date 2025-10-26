@@ -151,4 +151,14 @@ public class PromotionService {
         promotionRepo.save(existing);
     }
 
+    public Page<Promotion> getPromotionByName(String name, int page){
+        Pageable pageable = PageRequest.of(page, PAGE_SIZE);
+        return promotionRepo.searchPromotions(name, PromotionStatus.ABLE, pageable);
+    }
+
+    public Page<Promotion> getPromotionByType(String type, int page){
+        Pageable pageable = PageRequest.of(page, PAGE_SIZE);
+        return promotionRepo.searchPromotions(type, PromotionStatus.ABLE, pageable);
+    }
+
 }

@@ -47,4 +47,15 @@ public interface PromotionRepo extends JpaRepository<Promotion, Integer> {
         order by p.promotionDiscount desc
         """)
     Page<Promotion> findAllByOrderPromotionDiscountDesc(@Param("status") PromotionStatus promotion,Pageable pageable);
+
+
+    @Query("""
+        SELECT p FROM Promotion p
+        WHERE
+            (:keyword IS NULL OR LOWER(p.promotionName) LIKE LOWER(CONCAT('%', :keyword, '%'))
+             OR LOWER(p.promotionType) LIKE LOWER(CONCAT('%', :keyword, '%')))
+        AND
+            (:status IS NULL OR p.promotionStatus = :status)
+        """)
+    Page<Promotion> searchPromotions(@Param("keyword") String keyword, @Param("status") PromotionStatus status, Pageable pageable);
 }
