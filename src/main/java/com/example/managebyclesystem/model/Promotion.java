@@ -1,6 +1,7 @@
 package com.example.managebyclesystem.model;
 
 import com.example.managebyclesystem.constants.PromotionStatus;
+import com.example.managebyclesystem.constants.PromotionType;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -10,74 +11,79 @@ public class Promotion {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int promoId;
+    private int promotionId;
 
-    private String promoName;
-    private String promoType;
-    private double promoDiscount;
-
-    private LocalDate promoStartDate;
-    private LocalDate promoEndDate;
+    private String promotionName;
 
     @Enumerated(EnumType.STRING)
-    private PromotionStatus promoStatus = PromotionStatus.ABLE;
+    private PromotionType promotionType;
+
+    private double promotionDiscount;
+
+    private LocalDate promotionStartDate;
+    private LocalDate promotionEndDate;
+
+    @Enumerated(EnumType.STRING)
+    private PromotionStatus promotionStatus = PromotionStatus.ABLE;
 
     public Promotion() {
+
     }
 
-    public int getPromoId() {
-        return promoId;
+    // Getters & Setters
+    public int getPromotionId() {
+        return promotionId;
     }
 
-    public void setPromoId(int promoId) {
-        this.promoId = promoId;
+    public void setPromotionId(int promoId) {
+        this.promotionId = promoId;
     }
 
-    public String getPromoName() {
-        return promoName;
+    public String getPromotionName() {
+        return promotionName;
     }
 
-    public void setPromoName(String promoName) {
-        this.promoName = promoName;
+    public void setPromotionName(String promotionName) {
+        this.promotionName = promotionName;
     }
 
-    public String getPromoType() {
-        return promoType;
+    public PromotionType getPromotionType() {
+        return promotionType;
     }
 
-    public void setPromoType(String promoType) {
-        this.promoType = promoType;
+    public void setPromotionType(PromotionType promotionType) {
+        this.promotionType = promotionType;
     }
 
-    public double getPromoDiscount() {
-        return promoDiscount;
+    public double getPromotionDiscount() {
+        return promotionDiscount;
     }
 
-    public void setPromoDiscount(double promoDiscount) {
-        this.promoDiscount = promoDiscount;
+    public void setPromotionDiscount(double promotionDiscount) {
+        this.promotionDiscount = promotionDiscount;
     }
 
-    public LocalDate getPromoStartDate() {
-        return promoStartDate;
+    public LocalDate getPromotionStartDate() {
+        return promotionStartDate;
     }
 
-    public void setPromoStartDate(LocalDate promoStartDate) {
-        this.promoStartDate = promoStartDate;
+    public void setPromotionStartDate(LocalDate promotionStartDate) {
+        this.promotionStartDate = promotionStartDate;
     }
 
-    public LocalDate getPromoEndDate() {
-        return promoEndDate;
+    public LocalDate getPromotionEndDate() {
+        return promotionEndDate;
     }
 
-    public void setPromoEndDate(LocalDate promoEndDate) {
-        this.promoEndDate = promoEndDate;
+    public void setPromotionEndDate(LocalDate promotionEndDate) {
+        this.promotionEndDate = promotionEndDate;
     }
 
-    public PromotionStatus getPromoStatus() {
-        return promoStatus;
+    public PromotionStatus getPromotionStatus() {
+        return promotionStatus;
     }
 
-    public void setPromoStatus(PromotionStatus promoStatus) {
-        this.promoStatus = promoStatus;
+    public void setPromotionStatus(PromotionStatus promotionStatus) {
+        this.promotionStatus = promotionStatus;
     }
 }
