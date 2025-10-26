@@ -8,6 +8,7 @@ import com.example.managebyclesystem.repository.PaymentRepository;
 import com.example.managebyclesystem.repository.RentalOrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import java.util.List;
 
 @Service
 public class PaymentService {
@@ -52,4 +53,11 @@ public class PaymentService {
         paymentRepository.save(payment);
         System.out.println("Thêm thanh toán thành công cho đơn ID: " + rentalOrder.getRentalOrderId());
     }
+
+
+    // list able
+    public List<Payment> getAllActivePayments() {
+        return paymentRepository.findByPaymentStatus(Payment.PaymentStatus.Able);
+    }
+
 }
