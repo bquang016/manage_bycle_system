@@ -9,6 +9,7 @@ import com.example.managebyclesystem.repository.PaymentRepository;
 import com.example.managebyclesystem.repository.RentalOrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.*;
 
 import java.util.List;
 
@@ -125,6 +126,20 @@ public class PaymentService {
             throw new IllegalArgumentException("Vui lòng nhập mã đơn thuê hoặc chọn phương thức thanh toán.");
         }
         return paymentRepository.searchPayments(rentalOrderId, paymentMethod);
+    }
+
+
+    // phân trang + sort
+    public Page<Payment> getPaginatedAndSortedPayments(int pageNo, int pageSize, String sortField, String sortDir) {
+        int pageIndex = pageNo - 1; // vì PageRequest bắt đầu từ 0
+
+        Sort sort = sortDir.equalsIgnoreCase("asc")
+                ? Sort.by(sortField).ascending()
+                : Sort.by(sortField).descending();
+
+        Pageable pageable = PageRequest.of(pageIndex, pageSize, sort);
+
+        return paymentRepository.findByPaymentStatus(PaymentStatus.Able, pageable);
     }
 
 
