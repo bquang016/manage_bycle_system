@@ -20,46 +20,53 @@ public class PromotionController {
         this.promotionService = promotionService;
     }
 
-    @GetMapping
+    @GetMapping("/promotions")
     public String getAllPromotions(@RequestParam(defaultValue = "0") int page, Model model){
         Page<Promotion> promotionsPage = promotionService.getAllPromotion(page);
-        addPaginationAtttributes(model, promotionsPage, page);
-        return "promotions/list";
-    }
-
-    @GetMapping
-    public String getPromotionsNameAsc(@RequestParam(defaultValue = "0") int page, Model model){
-        Page<Promotion> promotionPage = promotionService.getAllOrderByNameAsc(page);
-        addPaginationAtttributes(model, promotionPage, page);
-        return "promotions/list";
-    }
-    @GetMapping
-    public String getPromotionsNameDesc(@RequestParam(defaultValue = "0") int page, Model model){
-        Page<Promotion> promotionPage = promotionService.getAllOrderByNameDesc(page);
-        addPaginationAtttributes(model, promotionPage, page);
-        return "promotions/list";
-    }
-
-    @GetMapping
-    public String getPromotionsDiscountAsc(@RequestParam(defaultValue = "0") int page, Model model){
-        Page<Promotion> promotionPage = promotionService.getAllOrderByDiscountAsc(page);
-        addPaginationAtttributes(model, promotionPage, page);
-        return "promotions/list";
-    }
-    @GetMapping
-    public String getPromotionsDiscountDesc(@RequestParam(defaultValue = "0") int page, Model model){
-        Page<Promotion> promotionPage = promotionService.getAllOrderByDiscountDesc(page);
-        addPaginationAtttributes(model, promotionPage, page);
+        addPaginationAttributes(model, promotionsPage, page);
         return "promotions/list";
     }
 
 
+    @GetMapping("/sort/name")
+    public String getPromotionsSortedByName(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "asc") String order, Model model) {
+        Page<Promotion> promotionPage;
 
-    private void addPaginationAtttributes(Model model, Page<Promotion> promotionPage, int page){
+        if ("desc".equalsIgnoreCase(order)) {
+            promotionPage = promotionService.getAllOrderByNameDesc(page);
+        } else {
+            promotionPage = promotionService.getAllOrderByNameAsc(page);
+        }
+
+        addPaginationAttributes(model, promotionPage, page);
+        model.addAttribute("sortType", "name");
+        model.addAttribute("order", order);
+        return "promotions/list";
+    }
+
+
+    @GetMapping("/sort/discount")
+    public String getPromotionsSortedByDiscount(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "asc") String order, Model model) {
+        Page<Promotion> promotionPage;
+
+        if ("desc".equalsIgnoreCase(order)) {
+            promotionPage = promotionService.getAllOrderByDiscountDesc(page);
+        } else {
+            promotionPage = promotionService.getAllOrderByDiscountAsc(page);
+        }
+
+        addPaginationAttributes(model, promotionPage, page);
+        model.addAttribute("sortType", "discount");
+        model.addAttribute("order", order);
+        return "promotions/list";
+    }
+
+    private void addPaginationAttributes(Model model, Page<Promotion> promotionPage, int page) {
         model.addAttribute("promotions", promotionPage.getContent());
-        model.addAttribute("currentPage",page);
+        model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", promotionPage.getTotalPages());
     }
+
 
     @GetMapping("/add")
     public String showAddForm(Model model) {
@@ -104,6 +111,28 @@ public class PromotionController {
         promotionService.deletePromotion(id);
         return "redirect:/promotions";
     }
+
+    @GetMapping("/search/name")
+    public String searchByName(@RequestParam String name, @RequestParam(defaultValue = "0") int page, Model model){
+        Page<Promotion> promotionPage = promotionService.getPromotionByName(name, page);
+        return prepareSearchModel(model, promotionPage, page,"name", name);
+    }
+
+    @GetMapping("/search/type")
+    public String searchByType(@RequestParam String type, @RequestParam(defaultValue = "0") int page, Model model){
+        Page<Promotion> promotionPage = promotionService.getPromotionByType(type, page);
+        return prepareSearchModel(model, promotionPage, page,"type", type);
+    }
+
+    private String prepareSearchModel(Model model, Page<Promotion> promotionPage, int page, String searchType, String keyword) {
+        model.addAttribute("promotions", promotionPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", promotionPage.getTotalPages());
+        model.addAttribute("searchType", searchType);
+        model.addAttribute("keyword", keyword);
+        return "promotions/list";
+    }
+
 
 
 }
