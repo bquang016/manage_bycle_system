@@ -7,16 +7,20 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import com.example.managebyclesystem.model.Bike;
+import com.example.managebyclesystem.service.BikeService;
 
 @Controller
 @RequestMapping("/maintenances")
 public class MaintenanceController {
 
     private final MaintenanceService maintenanceService;
+    private final BikeService bikeService;
 
     @Autowired
-    public MaintenanceController(MaintenanceService maintenanceService) {
+    public MaintenanceController(MaintenanceService maintenanceService, BikeService bikeService) {
         this.maintenanceService = maintenanceService;
+        this.bikeService = bikeService;
     }
 
     @GetMapping
@@ -75,6 +79,8 @@ public class MaintenanceController {
     @GetMapping("/add")
     public String showAddForm(Model model){
         model.addAttribute("maintenance", new Maintenance());
+        Page<Bike> bikePage = bikeService.getAllBikes(0, Integer.MAX_VALUE);
+        model.addAttribute("bikes", bikePage.getContent());
         return "maintenances/add";
     }
     @PostMapping("/add")
@@ -93,6 +99,8 @@ public class MaintenanceController {
         Maintenance maintenance = maintenanceService.getMaintenanceById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy bảo trì id:"+id));
         model.addAttribute("maintenance", maintenance);
+        Page<Bike> bikePage = bikeService.getAllBikes(0, Integer.MAX_VALUE);
+        model.addAttribute("bikes", bikePage.getContent());
         return "maintenances/edit";
     }
     @PostMapping("/edit/{id}")
@@ -102,6 +110,8 @@ public class MaintenanceController {
             return "redirect:/maintenances";
         } catch (IllegalArgumentException e) {
             model.addAttribute("errorMessage", e.getMessage());
+            Page<Bike> bikePage = bikeService.getAllBikes(0, Integer.MAX_VALUE);
+            model.addAttribute("bikes", bikePage.getContent());
             return "maintenances/edit";
         }
     }

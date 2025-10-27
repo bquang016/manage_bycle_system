@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <title>Thêm Bảo trì mới</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <h4 class="fw-bold py-3 mb-4">
+        <span class="text-muted fw-light">Quản lý Bảo trì /</span> Thêm mới
+    </h4>
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Thông tin bảo trì mới</h5>
+                    <a th:href="@{/maintenances}" class="btn btn-sm btn-outline-secondary"><i class='bx bx-arrow-back'></i> Quay lại</a>
+                </div>
+                <div class="card-body">
+                    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <strong th:text="${errorMessage}">Lỗi!</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    <div th:if="${#fields.hasErrors('maintenance.*')}" class="alert alert-warning" role="alert">
+                        Vui lòng kiểm tra lại thông tin:
+                        <ul> <li th:each="err : ${#fields.errors('maintenance.*')}" th:text="${err}" /> </ul>
+                    </div>
+
+                    <form th:action="@{/maintenances/add}" th:object="${maintenance}" method="post">
+
+                        <div class="mb-3">
+                            <label class="form-label" for="bikeId">Chọn xe bảo trì</label>
+                            <select class="form-select" id="bikeId" th:field="*{bikeId}" required="required">
+                                <option value="">-- Chọn xe --</option>
+                                <option th:each="bike : ${bikes}"
+                                        th:value="${bike.bikeId}"
+                                        th:text="${bike.bikeName + ' (ID: ' + bike.bikeId + ')'}">
+                                    Tên xe
+                                </option>
+                            </select>
+                            <small class="text-danger" th:if="${#fields.hasErrors('bikeId')}" th:errors="*{bikeId}"></small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label" for="maintenanceDate">Ngày bảo trì</label>
+                            <input type="date" class="form-control" id="maintenanceDate" th:field="*{maintenanceDate}" required="required" />
+                            <small class="text-danger" th:if="${#fields.hasErrors('maintenanceDate')}" th:errors="*{maintenanceDate}"></small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label" for="maintenanceDesc">Mô tả</label>
+                            <textarea class="form-control" id="maintenanceDesc" rows="3" placeholder="Mô tả chi tiết..." th:field="*{maintenanceDesc}" required="required"></textarea>
+                            <small class="text-danger" th:if="${#fields.hasErrors('maintenanceDesc')}" th:errors="*{maintenanceDesc}"></small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label" for="maintenanceCost">Chi phí (VND)</label>
+                            <input type="number" class="form-control" id="maintenanceCost" placeholder="Nhập chi phí" th:field="*{maintenanceCost}" required="required" min="0" step="1000" />
+                            <small class="text-danger" th:if="${#fields.hasErrors('maintenanceCost')}" th:errors="*{maintenanceCost}"></small>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Thêm bảo trì</button>
+                        <a th:href="@{/maintenances}" class="btn btn-outline-secondary">Hủy</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
