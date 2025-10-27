@@ -9,6 +9,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Page;
+import com.example.managebyclesystem.model.RentalOrder;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 
 @Controller
@@ -34,13 +36,20 @@ public class PaymentController {
     }
 
     @PostMapping("/add")
-    public String addPayment(@ModelAttribute Payment payment, Model model) {
+    public String addPayment(@ModelAttribute Payment payment,
+                             @RequestParam("rentalOrderId") Integer rentalOrderId, // <-- SỬA Ở ĐÂY
+                             Model model,
+                             RedirectAttributes redirectAttributes) {
         try {
+            RentalOrder rentalOrder = rentalOrderService.getOrderById(rentalOrderId)
+                    .orElseThrow(() -> new IllegalArgumentException("Đơn thuê không hợp lệ với ID: " + rentalOrderId));
+            payment.setRentalOrder(rentalOrder);
+
             paymentService.addPayment(payment);
-            model.addAttribute("message", "Thêm thanh toán thành công!");
+            redirectAttributes.addFlashAttribute("listSuccessMessage", "Thêm thanh toán thành công!");
             return "redirect:/payments";
         } catch (Exception e) {
-            model.addAttribute("error", e.getMessage());
+            model.addAttribute("errorMessage", e.getMessage());
             model.addAttribute("rentalOrders", rentalOrderService.getAllActiveRentalOrders());
             model.addAttribute("activeMenu", "payments");
             return "payments/add";
@@ -71,9 +80,17 @@ public class PaymentController {
 
 
     @PostMapping("/edit")
-    public String updatePayment(@ModelAttribute("payment") Payment updatedPayment, Model model) {
+    public String updatePayment(@ModelAttribute("payment") Payment updatedPayment,
+                                @RequestParam("rentalOrderId") Integer rentalOrderId,
+                                Model model,
+                                RedirectAttributes redirectAttributes) {
         try {
+            RentalOrder rentalOrder = rentalOrderService.getOrderById(rentalOrderId)
+                    .orElseThrow(() -> new IllegalArgumentException("Đơn thuê không hợp lệ với ID: " + rentalOrderId));
+            updatedPayment.setRentalOrder(rentalOrder);
+
             paymentService.updatePayment(updatedPayment);
+            redirectAttributes.addFlashAttribute("listSuccessMessage", "Cập nhật thanh toán thành công!"); // <-- SỬA Ở ĐÂY
             return "redirect:/payments";
         } catch (IllegalArgumentException e) {
             model.addAttribute("error", e.getMessage());
