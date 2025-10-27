@@ -25,11 +25,17 @@ public class RentalOrder {
     @Column(name = "rental_order_id")
     private int rentalOrderId;
 
-    @Column(name = "rental_order_customer_id", nullable = false)
-    private String rentalOrderCustomerId;
+    @ManyToOne
+    @JoinColumn(name = "customerId", nullable = false)
+    private Customer customerId;
 
-    @Column(name = "rental_order_bike_id", nullable = false)
-    private String rentalOrderBikeId;
+    @ManyToOne
+    @JoinColumn(name = "bikeId")
+    private Bike bikeId;
+
+    @ManyToOne
+    @JoinColumn(name = "promotionId")
+    private Promotion promotionId;
 
     @Column(name = "rental_order_rental_date", nullable = false)
     private LocalDate rentalOrderRentalDate;
@@ -48,67 +54,42 @@ public class RentalOrder {
     @Column(name = "rental_order_active_status")
     private ActiveStatus rentalOrderActiveStatus;
 
-    public int getRentalOrderId() {
-        return rentalOrderId;
+    public Customer getCustomerId(){
+        return customerId;
+    }
+    public void setCustomerId(Customer id){
+        this.customerId = id;
     }
 
-    public void setRentalOrderId(int rentalOrderId) {
-        this.rentalOrderId = rentalOrderId;
+    public Bike getBikeId(){
+        return bikeId;
+    }
+    public void setBikeId(Bike id){
+        this.bikeId = id;
     }
 
-    public String getRentalOrderCustomerId() {
-        return rentalOrderCustomerId;
+    public Promotion getPromotionId(){
+        return promotionId;
+    }
+    public void setPromotionId(Promotion id){
+        this.promotionId = id;
     }
 
-    public void setRentalOrderCustomerId(String rentalOrderCustomerId) {
-        this.rentalOrderCustomerId = rentalOrderCustomerId;
-    }
+    public int getRentalOrderId() {return rentalOrderId;}
+    public void setRentalOrderId(int rentalOrderId) {this.rentalOrderId = rentalOrderId;}
 
-    public String getRentalOrderBikeId() {
-        return rentalOrderBikeId;
-    }
+    public LocalDate getRentalOrderRentalDate() {return rentalOrderRentalDate;}
+    public void setRentalOrderRentalDate(LocalDate rentalOrderRentalDate) {this.rentalOrderRentalDate = rentalOrderRentalDate;}
 
-    public void setRentalOrderBikeId(String rentalOrderBikeId) {
-        this.rentalOrderBikeId = rentalOrderBikeId;
-    }
+    public LocalTime getRentalOrderRentalTime() {return rentalOrderRentalTime;}
+    public void setRentalOrderRentalTime(LocalTime rentalOrderRentalTime) {this.rentalOrderRentalTime = rentalOrderRentalTime;}
 
-    public LocalDate getRentalOrderRentalDate() {
-        return rentalOrderRentalDate;
-    }
+    public double getRentalOrderTotalAmount() {return rentalOrderTotalAmount;}
+    public void setRentalOrderTotalAmount(double rentalOrderTotalAmount) {this.rentalOrderTotalAmount = rentalOrderTotalAmount;}
 
-    public void setRentalOrderRentalDate(LocalDate rentalOrderRentalDate) {
-        this.rentalOrderRentalDate = rentalOrderRentalDate;
-    }
+    public RentalStatus getRentalOrderStatus() {return rentalOrderStatus;}
+    public void setRentalOrderStatus(RentalStatus rentalOrderStatus) {this.rentalOrderStatus = rentalOrderStatus;}
 
-    public LocalTime getRentalOrderRentalTime() {
-        return rentalOrderRentalTime;
-    }
-
-    public void setRentalOrderRentalTime(LocalTime rentalOrderRentalTime) {
-        this.rentalOrderRentalTime = rentalOrderRentalTime;
-    }
-
-    public double getRentalOrderTotalAmount() {
-        return rentalOrderTotalAmount;
-    }
-
-    public void setRentalOrderTotalAmount(double rentalOrderTotalAmount) {
-        this.rentalOrderTotalAmount = rentalOrderTotalAmount;
-    }
-
-    public RentalStatus getRentalOrderStatus() {
-        return rentalOrderStatus;
-    }
-
-    public void setRentalOrderStatus(RentalStatus rentalOrderStatus) {
-        this.rentalOrderStatus = rentalOrderStatus;
-    }
-
-    public ActiveStatus getRentalOrderActiveStatus() {
-        return rentalOrderActiveStatus;
-    }
-
-    public void setRentalOrderActiveStatus(ActiveStatus rentalOrderActiveStatus) {
-        this.rentalOrderActiveStatus = rentalOrderActiveStatus;
-    }
+    public ActiveStatus getRentalOrderActiveStatus() {return rentalOrderActiveStatus;}
+    public void setRentalOrderActiveStatus(ActiveStatus rentalOrderActiveStatus) {this.rentalOrderActiveStatus = rentalOrderActiveStatus;}
 }
