@@ -20,7 +20,7 @@ public class PromotionController {
         this.promotionService = promotionService;
     }
 
-    @GetMapping("/promotions")
+    @GetMapping
     public String getAllPromotions(@RequestParam(defaultValue = "0") int page, Model model){
         Page<Promotion> promotionsPage = promotionService.getAllPromotion(page);
         addPaginationAttributes(model, promotionsPage, page);
