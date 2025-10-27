@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <title th:text="'Sửa Khuyến mãi - ' + ${promotion.promotionName ?: 'N/A'}">Sửa Khuyến mãi</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <h4 class="fw-bold py-3 mb-4">
+        <span class="text-muted fw-light">Quản lý Khuyến mãi /</span> Sửa thông tin
+    </h4>
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0" th:text="'Sửa: ' + ${promotion.promotionName}"></h5>
+                    <a th:href="@{/promotions}" class="btn btn-sm btn-outline-secondary"><i class='bx bx-arrow-back'></i> Quay lại</a>
+                </div>
+                <div class="card-body">
+                    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <strong th:text="${errorMessage}">Lỗi!</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    <div th:if="${#fields.hasErrors('promotion.*')}" class="alert alert-warning" role="alert">
+                        Vui lòng kiểm tra lại thông tin:
+                        <ul> <li th:each="err : ${#fields.errors('promotion.*')}" th:text="${err}" /> </ul>
+                    </div>
+
+                    <form th:action="@{/promotions/edit/{id}(id=${promotion.promotionId})}" th:object="${promotion}" method="post">
+
+                        <input type="hidden" th:field="*{promotionId}" />
+
+                        <div class="mb-3">
+                            <label class="form-label" for="promotionName">Tên khuyến mãi</label>
+                            <input type="text" class="form-control" id="promotionName" th:field="*{promotionName}" required="required" />
+                            <small class="text-danger" th:if="${#fields.hasErrors('promotionName')}" th:errors="*{promotionName}"></small>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="promotionType">Loại khuyến mãi</label>
+                                <select class="form-select" id="promotionType" th:field="*{promotionType}" required="required">
+                                    <option th:each="typeVal : ${T(com.example.managebyclesystem.constants.PromotionType).values()}"
+                                            th:value="${typeVal}"
+                                            th:text="${typeVal.name() == 'PERCENTAGE' ? 'Phần trăm (%)' : 'Số tiền cố định (VND)'}"></option>
+                                </select>
+                                <small class="text-danger" th:if="${#fields.hasErrors('promotionType')}" th:errors="*{promotionType}"></small>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="promotionDiscount">Giá trị giảm</label>
+                                <input type="number" class="form-control" id="promotionDiscount" th:field="*{promotionDiscount}" required="required" min="0" />
+                                <small class="text-danger" th:if="${#fields.hasErrors('promotionDiscount')}" th:errors="*{promotionDiscount}"></small>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="promotionStartDate">Ngày bắt đầu</label>
+                                <input type="date" class="form-control" id="promotionStartDate" th:field="*{promotionStartDate}" required="required" />
+                                <small class="text-danger" th:if="${#fields.hasErrors('promotionStartDate')}" th:errors="*{promotionStartDate}"></small>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="promotionEndDate">Ngày kết thúc</label>
+                                <input type="date" class="form-control" id="promotionEndDate" th:field="*{promotionEndDate}" required="required" />
+                                <small class="text-danger" th:if="${#fields.hasErrors('promotionEndDate')}" th:errors="*{promotionEndDate}"></small>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label" for="promotionStatus">Trạng thái</label>
+                            <select class="form-select" id="promotionStatus" th:field="*{promotionStatus}">
+                                <option th:each="status : ${T(com.example.managebyclesystem.constants.PromotionStatus).values()}"
+                                        th:value="${status}"
+                                        th:text="${status.name() == 'ABLE' ? 'Hoạt động' : 'Đã xóa (Disable)'}"></option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                        <a th:href="@{/promotions}" class="btn btn-outline-secondary">Hủy</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
