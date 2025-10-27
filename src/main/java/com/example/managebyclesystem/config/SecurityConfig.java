@@ -21,12 +21,7 @@ public class SecurityConfig {
                                 "/register",
                                 "/h2-console/**"
                         ).permitAll()
-                        // yêu cầu ADMIN cho dashboard và staff
-                        .requestMatchers(
-                                "/dashboard",
-                                "/staffs/**"
-                        ).hasRole("ADMIN")
-                        // yêu cầu đăng nhập cho các request còn lại
+                        .requestMatchers("/staffs/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .formLogin(formLogin -> formLogin
@@ -38,17 +33,15 @@ public class SecurityConfig {
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/login?logout")
-                        .invalidateHttpSession(true)
+                        .invalidateHttpSession(true) // Hủy session
                         .deleteCookies("JSESSIONID")
                         .permitAll()
                 )
                 .csrf(csrf -> csrf
                         .ignoringRequestMatchers("/h2-console/**")
+
                 );
-
-
         http.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()));
-
 
         return http.build();
     }
