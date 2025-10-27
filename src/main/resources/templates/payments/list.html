@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <title>Quản lý Thanh toán</title>
+    <th:block layout:fragment="page_css">
+        <link rel="stylesheet" th:href="@{/css/payment.css}" />
+    </th:block>
+</head>
+<body>
+<div layout:fragment="content">
+    <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Quản lý /</span> Thanh toán</h4>
+
+    <div th:if="${listSuccessMessage}" class="alert alert-success alert-dismissible fade show" role="alert"> <strong th:text="${listSuccessMessage}"></strong> <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button> </div>
+    <div th:if="${listErrorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert"> <strong th:text="${listErrorMessage}"></strong> <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button> </div>
+    <div th:if="${listInfoMessage}" class="alert alert-info alert-dismissible fade show" role="alert"> <strong th:text="${listInfoMessage}"></strong> <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button> </div>
+
+    <div class="card">
+        <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-3">
+            <h5 class="mb-0">Danh sách Thanh toán</h5>
+            <div class="d-flex flex-wrap gap-3 align-items-center">
+                <form th:action="@{/payments/search}" method="GET" class="d-flex gap-2 align-items-center">
+                    <input type="number" name="rentalOrderId" class="form-control form-control-sm" placeholder="Tìm theo Mã đơn thuê..." th:value="${searchRentalOrderId}" style="width: auto;">
+                    <select name="paymentMethod" class="form-select form-select-sm" style="width: auto;">
+                        <option value="">Tất cả phương thức</option>
+                        <option th:each="method : ${T(com.example.managebyclesystem.model.Payment.PaymentMethod).values()}"
+                                th:value="${method}"
+                                th:text="${method.name() == 'CASH' ? 'Tiền mặt' : 'Chuyển khoản'}"
+                                th:selected="${method == searchPaymentMethod}"></option>
+                    </select>
+                    <button type="submit" class="btn btn-sm btn-info"><i class='bx bx-search'></i> Tìm</button>
+                    <a th:href="@{/payments}" class="btn btn-sm btn-outline-secondary" th:if="${searchRentalOrderId != null or searchPaymentMethod != null}">
+                        <i class='bx bx-x'></i> Xóa tìm
+                    </a>
+                </form>
+                <a th:href="@{/payments/add}" class="btn btn-primary btn-sm">
+                    <i class='bx bx-plus'></i> &nbsp; Thêm thanh toán
+                </a>
+            </div>
+        </div>
+        <div class="table-responsive text-nowrap">
+            <table class="table table-hover table-striped">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Mã đơn thuê</th>
+                    <th>Phương thức</th>
+                    <th>
+                        <a th:href="@{/payments(pageNo=1, pageSize=10, sortField='paymentAmount', sortDir=${sortField == 'paymentAmount' and sortDir == 'asc' ? 'desc' : 'asc'}, rentalOrderId=${searchRentalOrderId}, paymentMethod=${searchPaymentMethod})}">
+                            Số tiền
+                            <i th:class="${sortField == 'paymentAmount' ? (sortDir == 'asc' ? 'bx bx-sort-up' : 'bx bx-sort-down') : 'bx bx-sort'}"></i>
+                        </a>
+                    </th>
+                    <th>
+                        <a th:href="@{/payments(pageNo=1, pageSize=10, sortField='paymentDate', sortDir=${sortField == 'paymentDate' and sortDir == 'asc' ? 'desc' : 'asc'}, rentalOrderId=${searchRentalOrderId}, paymentMethod=${searchPaymentMethod})}">
+                            Ngày Thanh toán
+                            <i th:class="${sortField == 'paymentDate' ? (sortDir == 'asc' ? 'bx bx-sort-up' : 'bx bx-sort-down') : 'bx bx-sort'}"></i>
+                        </a>
+                    </th>
+                    <th>Trạng thái</th>
+                    <th>Hành động</th>
+                </tr>
+                </thead>
+                <tbody id="payment-table-body" class="table-border-bottom-0">
+                <tr th:if="${payments == null or #lists.isEmpty(payments)}">
+                    <td colspan="7">
+                        <div class="empty-state">
+                            <i class='bx bx-data'></i>
+                            <p th:text="${isSearchResult} ? 'Không tìm thấy thanh toán phù hợp.' : 'Chưa có giao dịch thanh toán nào.'"></p>
+                            <a th:if="${!isSearchResult}" th:href="@{/payments/add}" class="btn btn-sm btn-primary">Thêm thanh toán</a>
+                        </div>
+                    </td>
+                </tr>
+                <tr th:each="payment : ${payments}">
+                    <td th:text="${payment.paymentId}"></td>
+                    <td>
+                        <a th:href="@{|/rental-orders/edit/${payment.rentalOrder?.rentalOrderId}|}" th:text="'#' + ${payment.rentalOrder?.rentalOrderId ?: 'N/A'}" target="_blank"></a>
+                    </td>
+                    <td>
+                          <span th:if="${payment.paymentMethod != null}"
+                                th:text="${payment.paymentMethod.name() == 'CASH' ? 'Tiền mặt' : 'Chuyển khoản'}"
+                                th:classappend="${payment.paymentMethod.name() == 'CASH' ? 'bg-label-success' : 'bg-label-info'}"
+                                class="badge"></span>
+                    </td>
+                    <td class="fw-semibold" th:text="${#numbers.formatCurrency(payment.paymentAmount)}"></td>
+                    <td th:text="${#temporals.format(payment.paymentDate, 'dd-MM-yyyy')}"></td>
+                    <td>
+                          <span th:if="${payment.paymentStatus != null}"
+                                th:text="${#strings.equals(payment.paymentStatus.name(), 'Able') ? 'Hoạt động' : 'Vô hiệu hóa'}"
+                                th:classappend="${#strings.equals(payment.paymentStatus.name(), 'Able') ? 'bg-label-success' : 'bg-label-danger'}"
+                                class="badge"></span>
+                    </td>
+                    <td>
+                        <div class="table-actions">
+                            <a th:href="@{/payments/edit/{id}(id=${payment.paymentId})}"
+                               class="btn btn-sm btn-icon btn-outline-primary"
+                               data-bs-toggle="tooltip" title="Sửa">
+                                <i class="bx bx-edit-alt"></i>
+                            </a>
+                            <button class="btn btn-sm btn-icon btn-outline-danger btn-delete"
+                                    th:data-id="${payment.paymentId}"
+                                    th:data-order-id="${payment.rentalOrder?.rentalOrderId}"
+                                    data-bs-toggle="modal" data-bs-target="#deleteConfirmModal"
+                                    data-bs-toggle-tooltip="tooltip" title="Xóa (Vô hiệu hóa)">
+                                <i class="bx bx-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <nav class="mt-4" aria-label="Page navigation" th:if="${!isSearchResult and totalPages != null and totalPages > 1}">
+        <ul id="pagination" class="pagination justify-content-center">
+            <li class="page-item" th:classappend="${currentPage == 1 ? 'disabled' : ''}"> <a class="page-link" th:href="@{/payments(pageNo=${currentPage - 1}, pageSize=10, sortField=${sortField}, sortDir=${sortDir})}">&laquo;</a> </li>
+            <li class="page-item" th:each="i : ${#numbers.sequence(1, totalPages)}" th:classappend="${i == currentPage ? 'active' : ''}"> <a class="page-link" th:href="@{/payments(pageNo=${i}, pageSize=10, sortField=${sortField}, sortDir=${sortDir})}" th:text="${i}"></a> </li>
+            <li class="page-item" th:classappend="${currentPage == totalPages ? 'disabled' : ''}"> <a class="page-link" th:href="@{/payments(pageNo=${currentPage + 1}, pageSize=10, sortField=${sortField}, sortDir=${sortDir})}">&raquo;</a> </li>
+        </ul>
+    </nav>
+
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content">
+                <div class="modal-header"> <h5 class="modal-title">Xác nhận Vô hiệu hóa</h5> <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> </div>
+                <form id="delete-form" th:action="@{/payments/delete/0}" method="post">
+                    <input type="hidden" th:name="${_csrf?.parameterName}" th:value="${_csrf?.token}" th:if="${_csrf}" />
+                    <div class="modal-body"> Bạn có chắc chắn muốn vô hiệu hóa thanh toán cho đơn hàng <strong id="order-id-to-delete"></strong> không? </div>
+                    <div class="modal-footer"> <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button> <button type="submit" class="btn btn-danger">Vô hiệu hóa</button> </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="page_scripts">
+    <script>
+        $(document).ready(function () {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) { return new bootstrap.Tooltip(tooltipTriggerEl); });
+
+            const deleteModalEl = $('#deleteConfirmModal');
+            const orderIdToDeleteEl = $('#order-id-to-delete');
+            const deleteForm = $('#delete-form');
+
+            $('#payment-table-body').on('click', '.btn-delete', function () {
+                const paymentId = $(this).data('id');
+                const orderId = $(this).data('order-id');
+                if (paymentId && orderId !== undefined && deleteForm.length) {
+                    orderIdToDeleteEl.text(`#${orderId}`);
+                    const actionUrl = `/payments/delete/${paymentId}`;
+                    deleteForm.attr('action', actionUrl);
+                } else { console.error("Could not get IDs for deletion."); }
+            });
+
+            deleteModalEl?.on('hidden.bs.modal', function () {
+               deleteForm?.attr('action', '#');
+               orderIdToDeleteEl?.text('');
+            });
+        });
+    </script>
+</th:block>
+</body>
+</html>
