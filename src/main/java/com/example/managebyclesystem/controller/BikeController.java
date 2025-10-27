@@ -61,11 +61,13 @@ public class BikeController {
         model.addAttribute("bikes", bikePage.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", bikePage.getTotalPages());
+        model.addAttribute("activeMenu", "bikes");
     }
 
     @GetMapping("/add")
     public String showAddForm(Model model) {
         model.addAttribute("bike", new Bike());
+        model.addAttribute("activeMenu", "bikes");
         return "bikes/add";
     }
 
@@ -87,6 +89,7 @@ public class BikeController {
         Bike bike = bikeService.getBikeById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy xe đạp ID: " + id));
         model.addAttribute("bike", bike);
+        model.addAttribute("activeMenu", "bikes");
         return "bikes/edit";
     }
 

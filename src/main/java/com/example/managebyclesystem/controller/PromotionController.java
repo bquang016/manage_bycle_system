@@ -65,12 +65,14 @@ public class PromotionController {
         model.addAttribute("promotions", promotionPage.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", promotionPage.getTotalPages());
+        model.addAttribute("activeMenu", "promotions");
     }
 
 
     @GetMapping("/add")
     public String showAddForm(Model model) {
         model.addAttribute("promotion", new Promotion());
+        model.addAttribute("activeMenu", "promotions");
         return "promotions/add";
     }
 
@@ -91,6 +93,7 @@ public class PromotionController {
         Promotion promotion = promotionService.getPromotionById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy khách hàng id: " + id));
         model.addAttribute("promotion", promotion);
+        model.addAttribute("activeMenu", "promotions");
         return "promotions/edit";
     }
 
@@ -130,11 +133,13 @@ public class PromotionController {
         model.addAttribute("totalPages", promotionPage.getTotalPages());
         model.addAttribute("searchType", searchType);
         model.addAttribute("keyword", keyword);
+        model.addAttribute("activeMenu", "promotions");
         return "promotions/list";
     }
 
     @GetMapping("/apply")
-    public String showApplyPromotionForm() {
+    public String showApplyPromotionForm(Model model) {
+        model.addAttribute("activeMenu", "promotions");
         return "promotions/apply";
     }
 
@@ -147,6 +152,7 @@ public class PromotionController {
             model.addAttribute("originalPrice", price);
             model.addAttribute("finalPrice", finalPrice);
             model.addAttribute("message", "Áp dụng khuyến mãi thành công!");
+            model.addAttribute("activeMenu", "promotions");
 
             return "promotions/result";
         } catch (IllegalArgumentException e) {

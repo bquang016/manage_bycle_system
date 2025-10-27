@@ -35,6 +35,7 @@ public class StaffController {
         model.addAttribute("sortField", sortField);
         model.addAttribute("sortDir", sortDir);
         model.addAttribute("reverseSortDir", sortDir.equals("asc") ? "desc" : "asc");
+        model.addAttribute("activeMenu", "staffs");
 
         return "staffs/list";
     }
@@ -43,6 +44,7 @@ public class StaffController {
     @GetMapping("/add")
     public String showAddForm(Model model) {
         model.addAttribute("staff", new Staff());
+        model.addAttribute("activeMenu", "staffs");
         return "staffs/add";
     }
 
@@ -64,6 +66,7 @@ public class StaffController {
     public String showEditForm(@PathVariable("id") int id, Model model) {
         Staff staff = staffService.getStaffById(id);
         model.addAttribute("staff", staff);
+        model.addAttribute("activeMenu", "staffs");
         return "staffs/edit";
     }
 
@@ -105,6 +108,7 @@ public class StaffController {
         } catch (Exception e) {
             model.addAttribute("error", e.getMessage());
         }
+        model.addAttribute("activeMenu", "staffs");
         return "staffs/list";
     }
 }

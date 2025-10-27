@@ -74,6 +74,7 @@ public class MaintenanceController {
         model.addAttribute("maintenance", maintenancePage.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", maintenancePage.getTotalPages());
+        model.addAttribute("activeMenu", "maintenances");
     }
 
     @GetMapping("/add")
@@ -81,6 +82,7 @@ public class MaintenanceController {
         model.addAttribute("maintenance", new Maintenance());
         Page<Bike> bikePage = bikeService.getAllBikes(0, Integer.MAX_VALUE);
         model.addAttribute("bikes", bikePage.getContent());
+        model.addAttribute("activeMenu", "maintenances");
         return "maintenances/add";
     }
     @PostMapping("/add")
@@ -109,6 +111,7 @@ public class MaintenanceController {
         model.addAttribute("maintenance", maintenance);
         Page<Bike> bikePage = bikeService.getAllBikes(0, Integer.MAX_VALUE);
         model.addAttribute("bikes", bikePage.getContent());
+        model.addAttribute("activeMenu", "maintenances");
         return "maintenances/edit";
     }
     @PostMapping("/edit/{id}")
@@ -148,6 +151,7 @@ public class MaintenanceController {
         model.addAttribute("totalPages", maintenancePage.getTotalPages());
         model.addAttribute("searchType", searchType);
         model.addAttribute("keyword", keyword);
+        model.addAttribute("activeMenu", "maintenances");
         return "maintenances/list";
     }
 

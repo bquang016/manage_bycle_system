@@ -3,6 +3,7 @@ package com.example.managebyclesystem.controller;
 import com.example.managebyclesystem.model.Payment;
 import com.example.managebyclesystem.model.Payment.PaymentMethod;
 import com.example.managebyclesystem.service.PaymentService;
+import com.example.managebyclesystem.service.RentalOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,16 +16,20 @@ import org.springframework.data.domain.Page;
 public class PaymentController {
 
     private final PaymentService paymentService;
+    private final RentalOrderService rentalOrderService;
 
     @Autowired
-    public PaymentController(PaymentService paymentService) {
+    public PaymentController(PaymentService paymentService, RentalOrderService rentalOrderService) {
         this.paymentService = paymentService;
+        this.rentalOrderService = rentalOrderService;
     }
 
 
     @GetMapping("/add")
     public String showAddForm(Model model) {
         model.addAttribute("payment", new Payment());
+        model.addAttribute("rentalOrders", rentalOrderService.getAllActiveRentalOrders());
+        model.addAttribute("activeMenu", "payments");
         return "payments/add";
     }
 
@@ -36,6 +41,8 @@ public class PaymentController {
             return "redirect:/payments";
         } catch (Exception e) {
             model.addAttribute("error", e.getMessage());
+            model.addAttribute("rentalOrders", rentalOrderService.getAllActiveRentalOrders());
+            model.addAttribute("activeMenu", "payments");
             return "payments/add";
         }
     }
@@ -57,6 +64,8 @@ public class PaymentController {
     public String showEditForm(@PathVariable int id, Model model) {
         Payment payment = paymentService.getPaymentById(id);
         model.addAttribute("payment", payment);
+        model.addAttribute("rentalOrders", rentalOrderService.getAllActiveRentalOrders());
+        model.addAttribute("activeMenu", "payments");
         return "payments/edit";
     }
 
@@ -68,6 +77,8 @@ public class PaymentController {
             return "redirect:/payments";
         } catch (IllegalArgumentException e) {
             model.addAttribute("error", e.getMessage());
+            model.addAttribute("rentalOrders", rentalOrderService.getAllActiveRentalOrders());
+            model.addAttribute("activeMenu", "payments");
             return "payments/edit";
         }
     }
@@ -88,8 +99,10 @@ public class PaymentController {
             model.addAttribute("payments", paymentService.getAllActivePayments());
         }
 
+        model.addAttribute("rentalOrders", rentalOrderService.getAllActiveRentalOrders());
         model.addAttribute("rentalOrderId", rentalOrderId);
         model.addAttribute("selectedMethod", paymentMethod);
+        model.addAttribute("activeMenu", "payments");
 
         return "payments/list";
     }
@@ -113,6 +126,8 @@ public class PaymentController {
         model.addAttribute("sortDir", sortDir);
         model.addAttribute("reverseSortDir", sortDir.equals("asc") ? "desc" : "asc");
         model.addAttribute("isSearchResult", false);
+        model.addAttribute("activeMenu", "payments");
+        model.addAttribute("rentalOrders", rentalOrderService.getAllActiveRentalOrders());
         return "payments/list";
     }
 }
