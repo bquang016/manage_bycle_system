@@ -62,8 +62,8 @@ public class RentalOrderService {
 
         validateRentalOrder(updatedRentalOrder);
 
-        existing.setRentalOrderCustomerId(updatedRentalOrder.getRentalOrderCustomerId().trim());
-        existing.setRentalOrderBikeId(updatedRentalOrder.getRentalOrderBikeId().trim());
+        existing.setCustomerId(updatedRentalOrder.getCustomerId());
+        existing.setBikeId(updatedRentalOrder.getBikeId());
         existing.setRentalOrderRentalDate(updatedRentalOrder.getRentalOrderRentalDate());
         existing.setRentalOrderRentalTime(updatedRentalOrder.getRentalOrderRentalTime());
         existing.setRentalOrderTotalAmount(updatedRentalOrder.getRentalOrderTotalAmount());
@@ -87,11 +87,11 @@ public class RentalOrderService {
         rentalOrderRepository.save(order);
     }
     private void validateRentalOrder(RentalOrder rentalOrder) {
-        if (rentalOrder.getRentalOrderCustomerId() == null || rentalOrder.getRentalOrderCustomerId().trim().isEmpty()) {
-            throw new IllegalArgumentException("Mã khách hàng không được để trống");
+        if (rentalOrder.getCustomerId() == null) {
+            throw new IllegalArgumentException("Khách hàng không được để trống");
         }
-        if (rentalOrder.getRentalOrderBikeId() == null || rentalOrder.getRentalOrderBikeId().trim().isEmpty()) {
-            throw new IllegalArgumentException("Mã xe không được để trống");
+        if (rentalOrder.getBikeId() == null) {
+            throw new IllegalArgumentException("Xe không được để trống");
         }
         if (rentalOrder.getRentalOrderRentalDate() == null) {
             throw new IllegalArgumentException("Ngày thuê không được để trống");

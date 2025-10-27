@@ -32,8 +32,8 @@ public interface RentalOrderRepository extends JpaRepository<RentalOrder, Intege
 
     @Query("""
         SELECT r FROM RentalOrder r
-        WHERE (:customerId IS NULL OR LOWER(r.rentalOrderCustomerId) LIKE LOWER(CONCAT('%', :customerId, '%')))
-          AND (:bikeId IS NULL OR LOWER(r.rentalOrderBikeId) LIKE LOWER(CONCAT('%', :bikeId, '%')))
+        WHERE (:customerId IS NULL OR LOWER(r.customerId) LIKE LOWER(CONCAT('%', :customerId, '%')))
+          AND (:bikeId IS NULL OR LOWER(r.bikeId) LIKE LOWER(CONCAT('%', :bikeId, '%')))
           AND (:status IS NULL OR r.rentalOrderStatus = :status)
           AND r.rentalOrderActiveStatus = com.example.managebyclesystem.model.RentalOrder.ActiveStatus.ABLE
     """)
