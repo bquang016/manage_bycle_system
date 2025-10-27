@@ -189,4 +189,10 @@ public class PromotionService {
         return discountedPrice;
     }
 
+    public Page<Promotion> getActivePromotions(int page){
+        Pageable pageable = PageRequest.of(page, PAGE_SIZE);
+        return promotionRepo.findActivePromotions(LocalDate.now(), PromotionStatus.ABLE, pageable);
+    }
+
+
 }
