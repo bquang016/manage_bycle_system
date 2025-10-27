@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <title>Quản lý Khuyến mãi</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Quản lý /</span> Khuyến mãi</h4>
+
+    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong th:text="${successMessage}"></strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong th:text="${errorMessage}"></strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <div class="card">
+        <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-3">
+            <h5 class="mb-0">Danh sách Khuyến mãi</h5>
+            <div class="d-flex flex-wrap gap-3 align-items-center">
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="searchDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        Tìm kiếm theo...
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="searchDropdown">
+                        <li><a class="dropdown-item search-type-select" href="#" data-target-form="search-name-form">Tên</a></li>
+                        <li><a class="dropdown-item search-type-select" href="#" data-target-form="search-type-form">Loại</a></li>
+                    </ul>
+                </div>
+
+                <form th:action="@{/promotions/search/name}" method="GET" class="d-flex gap-2 search-form" id="search-name-form" style="display: none;">
+                    <input type="hidden" name="page" value="0"/>
+                    <input type="text" name="name" class="form-control form-control-sm" placeholder="Nhập tên..." th:value="${#strings.equals(searchType, 'name') ? keyword : ''}" required="required"/>
+                    <button type="submit" class="btn btn-sm btn-info"><i class='bx bx-search'></i></button>
+                </form>
+
+                <form th:action="@{/promotions/search/type}" method="GET" class="d-flex gap-2 search-form" id="search-type-form" style="display: none;">
+                    <input type="hidden" name="page" value="0"/>
+                    <select name="type" class="form-select form-select-sm" required="required">
+                        <option value="">-- Chọn loại --</option>
+                        <option th:each="typeVal : ${T(com.example.managebyclesystem.constants.PromotionType).values()}"
+                                th:value="${typeVal}"
+                                th:text="${typeVal.name() == 'PERCENTAGE' ? 'Phần trăm' : 'Số tiền cố định'}"
+                                th:selected="${#strings.equals(searchType, 'type') and #strings.equals(typeVal.name(), keyword)}"></option>
+                    </select>
+                    <button type="submit" class="btn btn-sm btn-info"><i class='bx bx-search'></i></button>
+                </form>
+
+                <a th:href="@{/promotions}" class="btn btn-sm btn-outline-secondary" th:if="${keyword}">
+                    <i class='bx bx-x'></i> Xóa tìm
+                </a>
+                <a th:href="@{/promotions/add}" class="btn btn-primary btn-sm">
+                    <i class='bx bx-plus'></i> &nbsp; Thêm khuyến mãi
+                </a>
+            </div>
+        </div>
+        <div class="table-responsive text-nowrap">
+            <table class="table table-hover table-striped">
+                <thead>
+                <tr>
+                    <th>
+                        <a th:href="@{/promotions/sort/name(page=${currentPage}, order=${sortType == 'name' and order == 'asc' ? 'desc' : 'asc'}, keyword=${keyword}, searchType=${searchType})}">Tên khuyến mãi</a>
+                    </th>
+                    <th>Loại</th>
+                    <th>
+                        <a th:href="@{/promotions/sort/discount(page=${currentPage}, order=${sortType == 'discount' and order == 'asc' ? 'desc' : 'asc'}, keyword=${keyword}, searchType=${searchType})}">Giảm giá</a>
+                    </th>
+                    <th>Ngày bắt đầu</th>
+                    <th>Ngày kết thúc</th>
+                    <th>Trạng thái</th>
+                    <th>Hành động</th>
+                </tr>
+                </thead>
+                <tbody id="promotion-table-body" class="table-border-bottom-0">
+                <tr th:if="${#lists.isEmpty(promotions)}">
+                    <td colspan="7">
+                        <div class="empty-state" style="text-align: center; padding: 40px 20px; opacity: 0.7;">
+                            <i class='bx bxs-purchase-tag-alt' style="font-size: 3rem; margin-bottom: 15px; color: #a1acb8;"></i>
+                            <p th:text="${keyword != null ? 'Không tìm thấy khuyến mãi phù hợp.' : 'Chưa có khuyến mãi nào.'}" style="font-size: 1.1rem; color: #697a8d;"></p>
+                            <a th:if="${keyword == null}" th:href="@{/promotions/add}" class="btn btn-sm btn-primary">
+                                Thêm khuyến mãi
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                <tr th:each="promo : ${promotions}">
+                    <td th:text="${promo.promotionName}"></td>
+                    <td>
+                            <span th:if="${promo.promotionType != null}"
+                                  th:text="${promo.promotionType.name() == 'PERCENTAGE' ? 'Phần trăm' : 'Số tiền cố định'}"
+                                  th:classappend="${promo.promotionType.name() == 'PERCENTAGE' ? 'bg-label-info' : 'bg-label-primary'}"
+                                  class="badge"></span>
+                    </td>
+                    <td th:text="${promo.promotionType.name() == 'PERCENTAGE' ? promo.promotionDiscount + '%' : #numbers.formatCurrency(promo.promotionDiscount)}"></td>
+                    <td th:text="${#temporals.format(promo.promotionStartDate, 'dd-MM-yyyy')}"></td>
+                    <td th:text="${#temporals.format(promo.promotionEndDate, 'dd-MM-yyyy')}"></td>
+                    <td>
+                            <span th:if="${promo.promotionStatus != null}"
+                                  th:text="${#strings.equals(promo.promotionStatus.name(), 'ABLE') ? 'Hoạt động' : 'Đã xóa'}"
+                                  th:classappend="${#strings.equals(promo.promotionStatus.name(), 'ABLE') ? 'bg-label-success' : 'bg-label-danger'}"
+                                  class="badge"></span>
+                    </td>
+                    <td>
+                        <div class="table-actions">
+                            <a th:href="@{/promotions/edit/{id}(id=${promo.promotionId})}" class="btn btn-sm btn-icon btn-outline-primary" data-bs-toggle="tooltip" title="Sửa">
+                                <i class="bx bx-edit-alt"></i>
+                            </a>
+                            <a th:href="@{/promotions/delete/{id}(id=${promo.promotionId})}"
+                               class="btn btn-sm btn-icon btn-outline-danger btn-delete"
+                               th:data-name="${promo.promotionName}"
+                               data-bs-toggle="tooltip" title="Xóa"
+                               th:onclick="'return confirm(\'Bạn có chắc chắn muốn xóa khuyến mãi: \' + this.getAttribute(\'data-name\') + \'?\');'">
+                                <i class="bx bx-trash"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <nav class="mt-4" aria-label="Page navigation" th:if="${totalPages != null and totalPages > 1}">
+        <ul id="pagination" class="pagination justify-content-center">
+            <li class="page-item" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
+                <a class="page-link" th:href="@{/promotions(page=${currentPage - 1}, sortType=${sortType}, order=${order}, keyword=${keyword}, searchType=${searchType})}">&laquo;</a>
+            </li>
+
+            <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                th:classappend="${i == currentPage ? 'active' : ''}">
+                <a class="page-link" th:href="@{/promotions(page=${i}, sortType=${sortType}, order=${order}, keyword=${keyword}, searchType=${searchType})}" th:text="${i + 1}"></a>
+            </li>
+
+            <li class="page-item" th:classappend="${currentPage == (totalPages - 1) ? 'disabled' : ''}">
+                <a class="page-link" th:href="@{/promotions(page=${currentPage + 1}, sortType=${sortType}, order=${order}, keyword=${keyword}, searchType=${searchType})}">&raquo;</a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+<th:block layout:fragment="page_scripts">
+    <script>
+        $(document).ready(function() {
+            const currentSearchType = /*[[${searchType}]]*/ null;
+            let initialFormId = 'search-name-form'; // Mặc định
+            let initialDropdownText = 'Tìm theo Tên';
+
+            if (currentSearchType === 'type') {
+                initialFormId = 'search-type-form';
+                initialDropdownText = 'Tìm theo Loại';
+            } else if (currentSearchType === 'name') {
+                initialFormId = 'search-name-form';
+                initialDropdownText = 'Tìm theo Tên';
+            }
+
+            if (currentSearchType) {
+                $('#' + initialFormId).show();
+                $('#searchDropdown').text(initialDropdownText);
+            } else {
+                $('#searchDropdown').text('Tìm kiếm theo...');
+            }
+
+            $('.search-type-select').on('click', function(e) {
+                e.preventDefault();
+                const targetFormId = $(this).data('target-form');
+                $('.search-form').hide();
+                $('#' + targetFormId).show();
+                $('#searchDropdown').text('Tìm theo ' + $(this).text());
+            });
+        });
+    </script>
+</th:block>
+</body>
+</html>
