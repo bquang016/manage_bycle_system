@@ -5,8 +5,7 @@
 <head>
     <title>Quản lý Đơn thuê</title>
     <th:block layout:fragment="page_css">
-        <link rel="stylesheet" th:href="@{/css/rental.css}"/>
-    </th:block>
+        <link rel="stylesheet" th:href="@{/css/rental.css}"/> </th:block>
 </head>
 <body>
 <div layout:fragment="content">
@@ -14,51 +13,50 @@
         <span class="text-muted fw-light">Quản lý /</span> Đơn thuê
     </h4>
 
-    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert"> <strong th:text="${successMessage}"></strong> <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button> </div>
-    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert"> <strong th:text="${errorMessage}"></strong> <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button> </div>
-    <div th:if="${message}" class="alert alert-info alert-dismissible fade show" role="alert"> <strong th:text="${message}"></strong> <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button> </div>
+    <div th:if="${listSuccessMessage}" class="alert alert-success alert-dismissible fade show" role="alert"> <strong th:text="${listSuccessMessage}"></strong> <button type="button" class="btn-close" data-bs-dismiss="alert"></button> </div>
+    <div th:if="${listErrorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert"> <strong th:text="${listErrorMessage}"></strong> <button type="button" class="btn-close" data-bs-dismiss="alert"></button> </div>
+    <div th:if="${listInfoMessage}" class="alert alert-info alert-dismissible fade show" role="alert"> <strong th:text="${listInfoMessage}"></strong> <button type="button" class="btn-close" data-bs-dismiss="alert"></button> </div>
 
     <div class="card">
-        <h5 class="card-header">Danh sách Đơn thuê</h5>
-        <div class="card-body">
-            <form th:action="@{/rental-orders/search}" method="GET" class="row g-3 mb-4 align-items-end">
-                <input type="hidden" name="page" value="0"/>
-
-                <div class="col-md-3 col-lg-3">
-                    <label for="searchCustomerId" class="form-label">Tìm theo ID Khách hàng</label>
-                    <input type="number" id="searchCustomerId" name="customerId" class="form-control form-control-sm"
-                           placeholder="Nhập ID khách hàng..."
-                           th:value="${searchCustomerId}"
-                           aria-label="Tìm kiếm theo ID khách hàng">
+        <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-3">
+            <h5 class="mb-0">Danh sách Đơn thuê</h5>
+            <div class="d-flex flex-wrap gap-3 align-items-center">
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="searchDropdown" data-bs-toggle="dropdown" aria-expanded="false"> Tìm kiếm theo... </button>
+                    <ul class="dropdown-menu" aria-labelledby="searchDropdown">
+                        <li><a class="dropdown-item search-type-select" href="#" data-target-form="search-customerId-form">ID Khách hàng</a></li>
+                        <li><a class="dropdown-item search-type-select" href="#" data-target-form="search-bikeId-form">ID Xe</a></li>
+                        <li><a class="dropdown-item search-type-select" href="#" data-target-form="search-status-form">Trạng thái</a></li>
+                    </ul>
                 </div>
 
-                <div class="col-md-3 col-lg-3">
-                    <label for="searchBikeId" class="form-label">Tìm theo ID Xe</label>
-                    <input type="number" id="searchBikeId" name="bikeId" class="form-control form-control-sm"
-                           placeholder="Nhập ID xe..."
-                           th:value="${searchBikeId}"
-                           aria-label="Tìm kiếm theo ID xe">
-                </div>
+                <form th:action="@{/rental-orders/search}" method="GET" class="d-flex gap-2 search-form" id="search-customerId-form" style="display: none;">
+                    <input type="hidden" name="page" value="0"/>
+                    <input type="number" name="customerId" class="form-control form-control-sm" placeholder="Nhập ID KH..." th:value="${searchCustomerId}" required="required" style="width: auto;"/>
+                    <button type="submit" class="btn btn-sm btn-info"><i class='bx bx-search'></i></button>
+                </form>
 
-                <div class="col-md-3 col-lg-3">
-                    <label for="filterStatus" class="form-label">Lọc theo Trạng thái</label>
-                    <select id="filterStatus" name="status" class="form-select form-select-sm" th:value="${searchStatus}">
-                        <option value="">Tất cả</option>
-                        <option th:each="status : ${T(com.example.managebyclesystem.model.RentalOrder.RentalStatus).values()}"
-                                th:value="${status}"
-                                th:text="${status.name() == 'COMPLETED' ? 'Đã hoàn thành' : (status.name() == 'ONGOING' ? 'Đang thuê' : (status.name() == 'CANCELLED' ? 'Đã hủy' : 'Đang chờ'))}"
-                                th:selected="${#strings.equals(status.name(), searchStatus)}"></option>
+                <form th:action="@{/rental-orders/search}" method="GET" class="d-flex gap-2 search-form" id="search-bikeId-form" style="display: none;">
+                    <input type="hidden" name="page" value="0"/>
+                    <input type="number" name="bikeId" class="form-control form-control-sm" placeholder="Nhập ID Xe..." th:value="${searchBikeId}" required="required" style="width: auto;"/>
+                    <button type="submit" class="btn btn-sm btn-info"><i class='bx bx-search'></i></button>
+                </form>
+
+                <form th:action="@{/rental-orders/search}" method="GET" class="d-flex gap-2 search-form" id="search-status-form" style="display: none;">
+                    <input type="hidden" name="page" value="0"/>
+                    <select name="status" class="form-select form-select-sm" required="required" style="width: auto;">
+                        <option value="">-- Chọn trạng thái --</option>
+                        <option th:each="st : ${T(com.example.managebyclesystem.model.RentalOrder.RentalStatus).values()}"
+                                th:value="${st}"
+                                th:text="${st.name() == 'COMPLETED' ? 'Đã hoàn thành' : (st.name() == 'ONGOING' ? 'Đang thuê' : (st.name() == 'CANCELLED' ? 'Đã hủy' : 'Đang chờ'))}"
+                                th:selected="${st.name() == searchStatus}"></option>
                     </select>
-                </div>
+                    <button type="submit" class="btn btn-sm btn-info"><i class='bx bx-search'></i></button>
+                </form>
 
-                <div class="col-md-3 col-lg-3 d-flex gap-2">
-                    <button type="submit" class="btn btn-primary btn-sm"><i class='bx bx-filter-alt'></i> Lọc/Tìm</button>
-
-                    <a th:href="@{/rental-orders}" class="btn btn-sm btn-outline-secondary" th:if="${searchCustomerId != null or searchBikeId != null or searchStatus != null}">
-                        <i class='bx bx-x'></i> Xóa lọc
-                    </a>
-                </div>
-            </form>
+                <a th:href="@{/rental-orders}" class="btn btn-sm btn-outline-secondary" th:if="${searchCustomerId != null or searchBikeId != null or searchStatus != null}"> <i class='bx bx-x'></i> Xóa tìm/lọc </a>
+                <a th:href="@{/rental-orders/add}" class="btn btn-primary btn-sm"> <i class='bx bx-plus'></i> &nbsp; Thêm đơn thuê </a>
+            </div>
         </div>
         <div class="table-responsive text-nowrap">
             <table class="table table-hover table-striped">
@@ -68,12 +66,16 @@
                     <th>Khách hàng</th>
                     <th>Xe đã thuê</th>
                     <th>
-                        <a th:href="@{/rental-orders/totalAsc(page=${currentPage})}" title="Sắp xếp tăng dần">Tổng tiền</a>
-                        <a th:href="@{/rental-orders/totalDesc(page=${currentPage})}" title="Sắp xếp giảm dần"><i class='bx bx-sort-down'></i></a>
+                        <a th:href="@{/rental-orders(page=${currentPage}, size=${#objects.nullSafe(orders?.size(), 10)}, sortField='rentalOrderTotalAmount', sortDir=${sortField == 'rentalOrderTotalAmount' and sortDir == 'asc' ? 'desc' : 'asc'}, customerId=${searchCustomerId}, bikeId=${searchBikeId}, status=${searchStatus})}" title="Sắp xếp theo tổng tiền">
+                            Tổng tiền
+                            <i th:class="${sortField == 'rentalOrderTotalAmount' ? (sortDir == 'asc' ? 'bx bx-sort-up' : 'bx bx-sort-down') : 'bx bx-sort'}"></i>
+                        </a>
                     </th>
                     <th>
-                        <a th:href="@{/rental-orders/dateAsc(page=${currentPage})}" title="Sắp xếp cũ nhất">Ngày thuê</a>
-                        <a th:href="@{/rental-orders/dateDesc(page=${currentPage})}" title="Sắp xếp mới nhất"><i class='bx bx-sort-down'></i></a>
+                        <a th:href="@{/rental-orders(page=${currentPage}, size=${#objects.nullSafe(orders?.size(), 10)}, sortField='rentalOrderRentalDate', sortDir=${sortField == 'rentalOrderRentalDate' and sortDir == 'asc' ? 'desc' : 'asc'}, customerId=${searchCustomerId}, bikeId=${searchBikeId}, status=${searchStatus})}" title="Sắp xếp theo ngày thuê">
+                            Ngày thuê
+                            <i th:class="${sortField == 'rentalOrderRentalDate' ? (sortDir == 'asc' ? 'bx bx-sort-up' : 'bx bx-sort-down') : 'bx bx-sort'}"></i>
+                        </a>
                     </th>
                     <th>Trạng thái</th>
                     <th>Hành động</th>
@@ -85,37 +87,38 @@
                         <div class="empty-state">
                             <i class='bx bx-file-blank'></i>
                             <p th:text="${searchCustomerId != null or searchBikeId != null or searchStatus != null} ? 'Không tìm thấy đơn thuê phù hợp.' : 'Chưa có đơn thuê nào.'"></p>
+                            <a th:if="${searchCustomerId == null and searchBikeId == null and searchStatus == null}" th:href="@{/rental-orders/add}" class="btn btn-sm btn-primary"> Thêm đơn thuê </a>
                         </div>
                     </td>
                 </tr>
                 <tr th:each="order : ${orders}">
-                    <td th:text="${order.rentalOrderId}"></td>
+                    <td th:text="'#' + ${order.rentalOrderId}"></td>
                     <td>
                         <div th:text="${order.customerId?.customerName ?: 'N/A'}"></div>
-                        <small class="text-muted" th:text="'ID: ' + ${order.customerId?.customerId} + ' - SĐT: ' + ${order.customerId?.customerPhone ?: 'N/A'}"></small>
+                        <small class="text-muted" th:text="'ID: ' + ${order.customerId?.customerId}"></small>
                     </td>
                     <td th:text="${order.bikeId?.bikeName ?: 'N/A'}"></td>
                     <td th:text="${#numbers.formatCurrency(order.rentalOrderTotalAmount)}"></td>
                     <td th:text="${#temporals.format(order.rentalOrderRentalDate, 'dd-MM-yyyy') + ' ' + #temporals.format(order.rentalOrderRentalTime, 'HH:mm')}"></td>
                     <td>
-                        <span th:if="${order.rentalOrderStatus != null}"
-                              th:text="${order.rentalOrderStatus.name() == 'COMPLETED' ? 'Đã hoàn thành' : (order.rentalOrderStatus.name() == 'ONGOING' ? 'Đang thuê' : (order.rentalOrderStatus.name() == 'CANCELLED' ? 'Đã hủy' : 'Đang chờ'))}"
-                              th:classappend="${order.rentalOrderStatus.name() == 'COMPLETED' ? 'bg-label-success' : (order.rentalOrderStatus.name() == 'ONGOING' ? 'bg-label-info' : (order.rentalOrderStatus.name() == 'CANCELLED' ? 'bg-label-danger' : 'bg-label-warning'))}"
-                              class="badge"></span>
+                         <span th:if="${order.rentalOrderStatus != null}"
+                               th:text="${order.rentalOrderStatus.name() == 'COMPLETED' ? 'Đã hoàn thành' : (order.rentalOrderStatus.name() == 'ONGOING' ? 'Đang thuê' : (order.rentalOrderStatus.name() == 'CANCELLED' ? 'Đã hủy' : 'Đang chờ'))}"
+                               th:classappend="${order.rentalOrderStatus.name() == 'COMPLETED' ? 'bg-label-success' : (order.rentalOrderStatus.name() == 'ONGOING' ? 'bg-label-info' : (order.rentalOrderStatus.name() == 'CANCELLED' ? 'bg-label-danger' : 'bg-label-warning'))}"
+                               class="badge"></span>
+                        <span th:unless="${order.rentalOrderStatus != null}" class="badge bg-label-secondary">Không rõ</span>
                     </td>
                     <td>
                         <div class="dropdown">
                             <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="bx bx-dots-vertical-rounded"></i></button>
                             <div class="dropdown-menu dropdown-menu-end">
-                                <a class="dropdown-item" th:href="@{/rental-orders/edit/{id}(id=${order.rentalOrderId})}"><i class="bx bx-edit-alt me-1"></i> Sửa chi tiết</a>
-                                <form th:action="@{/rental-orders/delete/{id}(id=${order.rentalOrderId})}" method="post" style="display:inline;">
-                                    <button type="submit" class="dropdown-item text-danger"
-                                            onclick="return confirm('Bạn có chắc chắn muốn vô hiệu hóa đơn thuê #' + [[${order.rentalOrderId}]] + '?');"
-                                            th:if="${order.rentalOrderActiveStatus.name() == 'ABLE'}">
+                                <a class="dropdown-item" th:href="@{/rental-orders/edit/{id}(id=${order.rentalOrderId})}"><i class="bx bx-edit-alt me-1"></i> Sửa</a>
+                                <form th:action="@{/rental-orders/delete/{id}(id=${order.rentalOrderId})}" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn vô hiệu hóa đơn thuê #' + [[${order.rentalOrderId}]] + '?');">
+                                    <input type="hidden" th:name="${_csrf?.parameterName}" th:value="${_csrf?.token}" th:if="${_csrf}" />
+                                    <button type="submit" class="dropdown-item text-danger" th:if="${order.rentalOrderActiveStatus.name() == 'ABLE'}">
                                         <i class="bx bx-trash me-1"></i> Vô hiệu hóa
                                     </button>
                                 </form>
-                                <span class="dropdown-item text-muted" th:if="${order.rentalOrderActiveStatus.name() == 'DISABLE'}">Đã vô hiệu hóa</span>
+                                <span class="dropdown-item text-muted disabled" th:if="${order.rentalOrderActiveStatus.name() == 'DISABLE'}">Đã vô hiệu hóa</span>
                             </div>
                         </div>
                     </td>
@@ -128,21 +131,55 @@
     <nav class="mt-4" aria-label="Page navigation" th:if="${totalPages != null and totalPages > 1}">
         <ul id="pagination" class="pagination justify-content-center">
             <li class="page-item" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
-                <a class="page-link" th:href="@{/rental-orders(page=${currentPage - 1}, customerId=${searchCustomerId}, bikeId=${searchBikeId}, status=${searchStatus})}">&laquo;</a>
+                <a class="page-link" th:href="@{/rental-orders(page=${currentPage - 1}, size=${#objects.nullSafe(orders?.size(), 10)}, sortField=${sortField}, sortDir=${sortDir}, customerId=${searchCustomerId}, bikeId=${searchBikeId}, status=${searchStatus})}">&laquo;</a>
             </li>
-
-            <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
-                th:classappend="${i == currentPage ? 'active' : ''}">
-                <a class="page-link" th:href="@{/rental-orders(page=${i}, customerId=${searchCustomerId}, bikeId=${searchBikeId}, status=${searchStatus})}" th:text="${i + 1}"></a>
+            <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}" th:classappend="${i == currentPage ? 'active' : ''}">
+                <a class="page-link" th:href="@{/rental-orders(page=${i}, size=${#objects.nullSafe(orders?.size(), 10)}, sortField=${sortField}, sortDir=${sortDir}, customerId=${searchCustomerId}, bikeId=${searchBikeId}, status=${searchStatus})}" th:text="${i + 1}"></a>
             </li>
-
             <li class="page-item" th:classappend="${currentPage == (totalPages - 1) ? 'disabled' : ''}">
-                <a class="page-link" th:href="@{/rental-orders(page=${currentPage + 1}, customerId=${searchCustomerId}, bikeId=${searchBikeId}, status=${searchStatus})}">&raquo;</a>
+                <a class="page-link" th:href="@{/rental-orders(page=${currentPage + 1}, size=${#objects.nullSafe(orders?.size(), 10)}, sortField=${sortField}, sortDir=${sortDir}, customerId=${searchCustomerId}, bikeId=${searchBikeId}, status=${searchStatus})}">&raquo;</a>
             </li>
         </ul>
     </nav>
 </div>
+
 <th:block layout:fragment="page_scripts">
+    <script>
+        // Script để chuyển đổi form tìm kiếm
+        $(document).ready(function() {
+            const currentSearchCustomerId = /*[[${searchCustomerId}]]*/ null;
+            const currentSearchBikeId = /*[[${searchBikeId}]]*/ null;
+            const currentSearchStatus = /*[[${searchStatus}]]*/ null;
+
+            let initialFormId = null;
+            let initialDropdownText = 'Tìm kiếm theo...';
+
+            if (currentSearchCustomerId) {
+                initialFormId = 'search-customerId-form';
+                initialDropdownText = 'Tìm theo ID Khách hàng';
+            } else if (currentSearchBikeId) {
+                initialFormId = 'search-bikeId-form';
+                initialDropdownText = 'Tìm theo ID Xe';
+            } else if (currentSearchStatus) {
+                initialFormId = 'search-status-form';
+                initialDropdownText = 'Tìm theo Trạng thái';
+            }
+
+            // Hiển thị form đúng khi tải lại trang
+            if (initialFormId) {
+                $('#' + initialFormId).show();
+                $('#searchDropdown').text(initialDropdownText);
+            }
+
+            $('.search-type-select').on('click', function(e) {
+                e.preventDefault();
+                const targetFormId = $(this).data('target-form');
+                $('.search-form').hide();
+                $('#' + targetFormId).show();
+                $('#searchDropdown').text($(this).text()); // Cập nhật text dropdown
+            });
+        });
+    </script>
 </th:block>
 </body>
 </html>
