@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <title th:text="'Sửa Đơn thuê - #' + ${rentalOrder.rentalOrderId ?: 'Không tìm thấy'}">Sửa Đơn thuê</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <h4 class="fw-bold py-3 mb-4">
+        <span class="text-muted fw-light">Quản lý Đơn thuê /</span> Sửa thông tin
+    </h4>
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0" th:text="'Sửa thông tin Đơn thuê: #' + ${rentalOrder.rentalOrderId ?: 'Lỗi'}"></h5>
+                    <a th:href="@{/rental-orders}" class="btn btn-sm btn-outline-secondary"><i class='bx bx-arrow-back'></i> Quay lại</a>
+                </div>
+                <div class="card-body">
+                    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <strong th:text="${errorMessage}">Lỗi!</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    <form th:action="@{/rental-orders/edit}" th:object="${rentalOrder}" method="post">
+                        <input type="hidden" th:field="*{rentalOrderId}" />
+                        <input type="hidden" th:field="*{rentalOrderActiveStatus}" />
+
+                        <div class="mb-3">
+                            <label class="form-label" for="customerIdSelect">Khách hàng</label>
+                            <select class="form-select" id="customerIdSelect" th:field="*{customerId}" required="required">
+                                <option value="">-- Chọn Khách hàng --</option>
+                                <option th:each="customer : ${customers}"
+                                        th:value="${customer.customerId}"
+                                        th:text="${customer.customerName + ' (ID: ' + customer.customerId + ')'}"
+                                        th:selected="${rentalOrder.customerId != null and customer.customerId == rentalOrder.customerId.customerId}">
+                                    Tên Khách hàng
+                                </option>
+                            </select>
+                            <small class="text-danger" th:if="${#fields.hasErrors('customerId')}" th:errors="*{customerId}"></small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label" for="bikeIdSelect">Xe đạp</label>
+                            <select class="form-select" id="bikeIdSelect" th:field="*{bikeId}" required="required">
+                                <option value="">-- Chọn Xe đạp --</option>
+                                <option th:each="bike : ${bikes}"
+                                        th:value="${bike.bikeId}"
+                                        th:text="${bike.bikeName + ' (ID: ' + bike.bikeId + ')'}"
+                                        th:selected="${rentalOrder.bikeId != null and bike.bikeId == rentalOrder.bikeId.bikeId}">
+                                    Tên Xe
+                                </option>
+                            </select>
+                            <small class="text-danger" th:if="${#fields.hasErrors('bikeId')}" th:errors="*{bikeId}"></small>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="rentalOrderRentalDate">Ngày thuê</label>
+                                <input type="date" class="form-control" id="rentalOrderRentalDate"
+                                       th:field="*{rentalOrderRentalDate}" required="required" />
+                                <small class="text-danger" th:if="${#fields.hasErrors('rentalOrderRentalDate')}" th:errors="*{rentalOrderRentalDate}"></small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="rentalOrderRentalTime">Giờ thuê</label>
+                                <input type="time" class="form-control" id="rentalOrderRentalTime"
+                                       th:field="*{rentalOrderRentalTime}" step="1" required="required" />
+                                <small class="text-danger" th:if="${#fields.hasErrors('rentalOrderRentalTime')}" th:errors="*{rentalOrderRentalTime}"></small>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label" for="rentalOrderTotalAmount">Tổng tiền</label>
+                            <input type="number" class="form-control" id="rentalOrderTotalAmount"
+                                   th:field="*{rentalOrderTotalAmount}" required="required" min="0" step="1000" />
+                            <small class="text-danger" th:if="${#fields.hasErrors('rentalOrderTotalAmount')}" th:errors="*{rentalOrderTotalAmount}"></small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label" for="rentalOrderStatus">Trạng thái Đơn hàng</label>
+                            <select class="form-select" id="rentalOrderStatus" th:field="*{rentalOrderStatus}" required="required">
+                                <option th:each="status : ${T(com.example.managebyclesystem.model.RentalOrder.RentalStatus).values()}"
+                                        th:value="${status}"
+                                        th:text="${status.name() == 'COMPLETED' ? 'Đã hoàn thành' : (status.name() == 'ONGOING' ? 'Đang thuê' : (status.name() == 'CANCELLED' ? 'Đã hủy' : 'Đang chờ'))}">
+                                </option>
+                            </select>
+                            <small class="text-danger" th:if="${#fields.hasErrors('rentalOrderStatus')}" th:errors="*{rentalOrderStatus}"></small>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                        <a th:href="@{/rental-orders}" class="btn btn-outline-secondary">Hủy</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="page_scripts">
+</th:block>
+</body>
+</html>
