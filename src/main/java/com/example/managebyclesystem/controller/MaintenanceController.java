@@ -84,12 +84,20 @@ public class MaintenanceController {
         return "maintenances/add";
     }
     @PostMapping("/add")
-    public String addMaintenance(@ModelAttribute("maintenance") Maintenance maintenance, Model model){
+    public String addMaintenance(
+            @ModelAttribute("maintenance") Maintenance maintenance,
+            @RequestParam ("bikeId") Integer bikeId,
+            Model model){
         try {
+            Bike selectedBike = bikeService.getBikeById(bikeId)
+                    .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy xe có ID: " + bikeId));
+            maintenance.setBikeId(selectedBike);
             maintenanceService.addMaintenance(maintenance);
             return "redirect:/maintenances";
         }catch (IllegalArgumentException e){
-            model.addAttribute("errorMesage", e.getMessage());
+            model.addAttribute("errorMessage", e.getMessage());
+            Page<Bike> bikePage = bikeService.getAllBikes(0, Integer.MAX_VALUE);
+            model.addAttribute("bikes", bikePage.getContent());
             return "maintenances/add";
         }
     }
