@@ -7,6 +7,7 @@ import com.example.managebyclesystem.repository.RentalOrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
+import java.util.List;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -22,9 +23,13 @@ public class RentalOrderService {
         this.rentalOrderRepository = rentalOrderRepository;
     }
 
+    public List<RentalOrder> getAllActiveRentalOrders() {
+        return rentalOrderRepository.findByRentalOrderActiveStatus(ActiveStatus.ABLE);
+    }
+
     public Page<RentalOrder> getAllOrders(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return rentalOrderRepository.findByActiveStatus(ActiveStatus.ABLE, pageable);
+        return rentalOrderRepository.findByRentalOrderActiveStatus(ActiveStatus.ABLE, pageable);
     }
 
     public Optional<RentalOrder> getOrderById(int id) {

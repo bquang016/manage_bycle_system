@@ -71,11 +71,13 @@ public class CustomerController {
         model.addAttribute("currentPage", page);
         //lấy tổng số trang của cái phân trang á
         model.addAttribute("totalPages", customerPage.getTotalPages());
+        model.addAttribute("activeMenu", "customers");
     }
 
     @GetMapping("/add")
     public String showAddForm(Model model) {
         model.addAttribute("customer", new Customer());
+        model.addAttribute("activeMenu", "customers");
         return "customers/add";
     }
 
@@ -95,6 +97,7 @@ public class CustomerController {
         Customer customer = customerService.getCustomerById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy khách hàng id: " + id));
         model.addAttribute("customer", customer);
+        model.addAttribute("activeMenu", "customers");
         return "customers/edit";
     }
 
@@ -133,6 +136,7 @@ public class CustomerController {
         model.addAttribute("totalPages", customerPage.getTotalPages());
         model.addAttribute("searchType", searchType);
         model.addAttribute("keyword", keyword);
+        model.addAttribute("activeMenu", "customers");
         return "customers/list";
     }
 

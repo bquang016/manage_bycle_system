@@ -8,15 +8,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import java.util.List;
 
 @Repository
 public interface RentalOrderRepository extends JpaRepository<RentalOrder, Integer> {
 
-    @Query("""
-        SELECT r FROM RentalOrder r
-        WHERE r.rentalOrderActiveStatus = :status
-    """)
-    Page<RentalOrder> findByActiveStatus(@Param("status") ActiveStatus status, Pageable pageable);
+    // Find pageable active orders by enum value
+    @Query("SELECT r FROM RentalOrder r WHERE r.rentalOrderActiveStatus = :status")
+    Page<RentalOrder> findByRentalOrderActiveStatus(@Param("status") ActiveStatus status, Pageable pageable);
 
     @Query("SELECT r FROM RentalOrder r ORDER BY r.rentalOrderRentalDate ASC")
     Page<RentalOrder> findAllByOrderByRentalDateAsc(Pageable pageable);
@@ -30,16 +29,19 @@ public interface RentalOrderRepository extends JpaRepository<RentalOrder, Intege
     @Query("SELECT r FROM RentalOrder r ORDER BY r.rentalOrderTotalAmount DESC")
     Page<RentalOrder> findAllByOrderByTotalAmountDesc(Pageable pageable);
 
+    // List all active rental orders (non-pageable)
+    List<RentalOrder> findByRentalOrderActiveStatus(ActiveStatus status);
+
+    // Search by customer name, bike name and status (optional params). Uses nested properties.
     @Query("""
         SELECT r FROM RentalOrder r
-        WHERE (:customerId IS NULL OR LOWER(r.customerId) LIKE LOWER(CONCAT('%', :customerId, '%')))
-          AND (:bikeId IS NULL OR LOWER(r.bikeId) LIKE LOWER(CONCAT('%', :bikeId, '%')))
+        WHERE (:customerName IS NULL OR LOWER(r.customerId.customerName) LIKE LOWER(CONCAT('%', :customerName, '%')))
+          AND (:bikeName IS NULL OR LOWER(r.bikeId.bikeName) LIKE LOWER(CONCAT('%', :bikeName, '%')))
           AND (:status IS NULL OR r.rentalOrderStatus = :status)
-          AND r.rentalOrderActiveStatus = com.example.managebyclesystem.model.RentalOrder.ActiveStatus.ABLE
     """)
     Page<RentalOrder> searchRentalOrders(
-            @Param("customerId") String customerId,
-            @Param("bikeId") String bikeId,
+            @Param("customerName") String customerName,
+            @Param("bikeName") String bikeName,
             @Param("status") RentalStatus status,
             Pageable pageable
     );

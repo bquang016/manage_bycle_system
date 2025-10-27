@@ -42,6 +42,7 @@ public class RentalOrderController {
         model.addAttribute("orders", orderPage.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", orderPage.getTotalPages());
+        model.addAttribute("activeMenu", "rentals");
     }
 
     private void populateFormModelAttributes(Model model, RentalOrder rentalOrder) {
@@ -220,6 +221,7 @@ public class RentalOrderController {
         model.addAttribute("searchCustomerId", customerId);
         model.addAttribute("searchBikeId", bikeId);
         model.addAttribute("searchStatus", status);
+        model.addAttribute("activeMenu", "rentals");
         return "rental_orders/list";
     }
     @PostMapping("/delete/{id}")
