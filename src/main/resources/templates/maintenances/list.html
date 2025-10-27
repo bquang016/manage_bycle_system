@@ -4,40 +4,51 @@
       layout:decorate="~{fragments/layout}">
 <head>
     <title>Quản lý Bảo trì</title>
-    <th:block layout:fragment="page_css">
-        <link rel="stylesheet" th:href="@{/css/maintenance.css}" />
-    </th:block>
 </head>
 <body>
 <div layout:fragment="content">
     <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Quản lý /</span> Bảo trì</h4>
 
-    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert"> <strong th:text="${successMessage}"></strong> <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button> </div>
-    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert"> <strong th:text="${errorMessage}"></strong> <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button> </div>
+    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong th:text="${successMessage}"></strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong th:text="${errorMessage}"></strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
 
     <div class="card">
         <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-3">
-            <h5 class="mb-0">Lịch sử Bảo trì</h5>
+            <h5 class="mb-0">Danh sách Bảo trì</h5>
             <div class="d-flex flex-wrap gap-3 align-items-center">
-                <form th:action="@{/maintenances}" method="GET" class="d-flex gap-2 align-items-center">
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="searchDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        Tìm kiếm theo...
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="searchDropdown">
+                        <li><a class="dropdown-item search-type-select" href="#" data-target-form="search-bikeId-form">ID Xe</a></li>
+                        <li><a class="dropdown-item search-type-select" href="#" data-target-form="search-date-form">Ngày</a></li>
+                    </ul>
+                </div>
+
+                <form th:action="@{/maintenances/search/bikeId}" method="GET" class="d-flex gap-2 search-form" id="search-bikeId-form" style="display: none;">
                     <input type="hidden" name="page" value="0"/>
-                    <input type="hidden" name="sortField" th:value="${sortField}"/>
-                    <input type="hidden" name="sortDir" th:value="${sortDir}"/>
-
-                    <select name="searchType" class="form-select form-select-sm" style="width: auto;">
-                        <option value="bikeId" th:selected="${#strings.equals(searchType, 'bikeId')}">Tìm theo Mã Xe</option>
-                        <option value="date" th:selected="${#strings.equals(searchType, 'date')}">Tìm theo Ngày</option>
-                    </select>
-                    <input type="text" name="keyword" class="form-control form-control-sm search-input" id="search-bikeId" placeholder="Nhập mã xe..." th:value="${#strings.equals(searchType, 'bikeId') ? keyword : ''}" style="width: auto;" th:styleappend="${#strings.equals(searchType, 'bikeId') or searchType == null ? '' : 'display:none;'}"/>
-                    <input type="date" name="keyword" class="form-control form-control-sm search-input" id="search-date" th:value="${#strings.equals(searchType, 'date') ? keyword : ''}" style="width: auto;" th:styleappend="${#strings.equals(searchType, 'date') ? '' : 'display:none;'}"/>
-
-                    <button type="submit" class="btn btn-sm btn-info"><i class='bx bx-search'></i> Tìm</button>
-                    <a th:href="@{/maintenances(page=${currentPage}, sortField=${sortField}, sortDir=${sortDir})}" class="btn btn-sm btn-outline-secondary" th:if="${keyword}">
-                        <i class='bx bx-x'></i> Xóa tìm
-                    </a>
+                    <input type="number" name="bikeId" class="form-control form-control-sm" placeholder="Nhập ID xe..." th:value="${#strings.equals(searchType, 'bikeId') ? keyword : ''}" required="required"/>
+                    <button type="submit" class="btn btn-sm btn-info"><i class='bx bx-search'></i></button>
                 </form>
+
+                <form th:action="@{/maintenances/search/date}" method="GET" class="d-flex gap-2 search-form" id="search-date-form" style="display: none;">
+                    <input type="hidden" name="page" value="0"/>
+                    <input type="date" name="date" class="form-control form-control-sm" th:value="${#strings.equals(searchType, 'date') ? keyword : ''}" required="required"/>
+                    <button type="submit" class="btn btn-sm btn-info"><i class='bx bx-search'></i></button>
+                </form>
+
+                <a th:href="@{/maintenances}" class="btn btn-sm btn-outline-secondary" th:if="${keyword}">
+                    <i class='bx bx-x'></i> Xóa tìm
+                </a>
                 <a th:href="@{/maintenances/add}" class="btn btn-primary btn-sm">
-                    <i class='bx bx-plus'></i> &nbsp; Thêm Lịch Bảo trì
+                    <i class='bx bx-plus'></i> &nbsp; Thêm bảo trì
                 </a>
             </div>
         </div>
@@ -45,59 +56,55 @@
             <table class="table table-hover table-striped">
                 <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>Xe đạp</th>
+                    <th>ID Xe</th>
+                    <th>Tên xe</th>
                     <th>
-                        <a th:href="@{/maintenances(page=${currentPage}, sortField='maintenanceDate', sortDir=${sortField == 'maintenanceDate' and sortDir == 'asc' ? 'desc' : 'asc'}, keyword=${keyword}, searchType=${searchType})}">
-                            Ngày Bảo trì <i th:class="${sortField == 'maintenanceDate' ? (sortDir == 'asc' ? 'bx bx-sort-up' : 'bx bx-sort-down') : 'bx bx-sort'}"></i>
-                        </a>
+                        <a th:href="@{/maintenances/sort/date(page=${currentPage}, order=${sortType == 'date' and order == 'asc' ? 'desc' : 'asc'}, keyword=${keyword}, searchType=${searchType})}" title="Sắp xếp theo ngày">Ngày bảo trì</a>
                     </th>
                     <th>Mô tả</th>
                     <th>
-                        <a th:href="@{/maintenances(page=${currentPage}, sortField='maintenanceCost', sortDir=${sortField == 'maintenanceCost' and sortDir == 'asc' ? 'desc' : 'asc'}, keyword=${keyword}, searchType=${searchType})}">
-                            Chi phí <i th:class="${sortField == 'maintenanceCost' ? (sortDir == 'asc' ? 'bx bx-sort-up' : 'bx bx-sort-down') : 'bx bx-sort'}"></i>
-                        </a>
+                        <a th:href="@{/maintenances/sort/cost(page=${currentPage}, order=${sortType == 'cost' and order == 'asc' ? 'desc' : 'asc'}, keyword=${keyword}, searchType=${searchType})}" title="Sắp xếp theo chi phí">Chi phí</a>
                     </th>
                     <th>Trạng thái</th>
                     <th>Hành động</th>
                 </tr>
                 </thead>
                 <tbody id="maintenance-table-body" class="table-border-bottom-0">
-                <tr th:if="${#lists.isEmpty(maintenances)}">
-                    <td colspan="7"> <div class="empty-state">
-                        <i class='bx bxs-traffic-cone'></i>
-                        <p th:text="${keyword != null ? 'Không tìm thấy lịch sử phù hợp.' : 'Chưa có lịch sử bảo trì nào.'}"></p>
-                        <a th:if="${keyword == null}" th:href="@{/maintenances/add}" class="btn btn-sm btn-primary">Thêm Lịch Bảo trì đầu tiên</a>
-                    </div>
+                <tr th:if="${#lists.isEmpty(maintenance)}">
+                    <td colspan="7">
+                        <div class="empty-state" style="text-align: center; padding: 40px 20px; opacity: 0.7;">
+                            <i class='bx bxs-wrench' style="font-size: 3rem; margin-bottom: 15px; color: #a1acb8;"></i>
+                            <p th:text="${keyword != null ? 'Không tìm thấy lịch bảo trì phù hợp.' : 'Chưa có lịch bảo trì nào.'}" style="font-size: 1.1rem; color: #697a8d;"></p>
+                            <a th:if="${keyword == null}" th:href="@{/maintenances/add}" class="btn btn-sm btn-primary">
+                                Thêm lịch bảo trì
+                            </a>
+                        </div>
                     </td>
                 </tr>
-                <tr th:each="maint : ${maintenances}">
-                    <td><strong th:text="'#' + ${maint.maintenanceId}"></strong></td>
-                    <td th:text="${maint.bikeId?.bikeName} ?: (${maint.bikeId?.bikeId != 0 ? 'ID: ' + maint.bikeId.bikeId : '-'})">Bike Info</td>
-                    <td th:text="${maint.maintenanceDate != null ? #temporals.format(maint.maintenanceDate, 'dd/MM/yyyy') : '-'}">Date</td>
-                    <td th:text="${maint.maintenanceDesc} ?: '-'">Description</td>
-                    <td class="fw-semibold" th:text="${#numbers.formatCurrency(maint.maintenanceCost)}">Cost</td>
+                <tr th:each="maint : ${maintenance}">
+                    <td th:text="${maint.bikeId?.bikeId ?: 'N/A'}"></td>
+                    <td th:text="${maint.bikeId?.bikeName ?: 'Không rõ'}"></td>
+                    <td th:text="${#temporals.format(maint.maintenanceDate, 'dd-MM-yyyy')}"></td>
+                    <td th:text="${maint.maintenanceDesc}"></td>
+                    <td th:text="${#numbers.formatCurrency(maint.maintenanceCost)}"></td>
                     <td>
-                         <span th:if="${maint.maintenanceStatus != null}"
-                               th:text="${#strings.equals(maint.maintenanceStatus.name(), 'ABLE') ? 'Hoạt động' : 'Đã xóa'}"
-                               th:classappend="${#strings.equals(maint.maintenanceStatus.name(), 'ABLE') ? 'bg-label-success' : 'bg-label-danger'}"
-                               class="badge"></span>
-                        <span th:unless="${maint.maintenanceStatus != null}" class="badge bg-label-secondary">N/A</span>
+                            <span th:if="${maint.maintenanceStatus != null}"
+                                  th:text="${#strings.equals(maint.maintenanceStatus.name(), 'ABLE') ? 'Hoạt động' : 'Đã xóa'}"
+                                  th:classappend="${#strings.equals(maint.maintenanceStatus.name(), 'ABLE') ? 'bg-label-success' : 'bg-label-danger'}"
+                                  class="badge"></span>
                     </td>
                     <td>
                         <div class="table-actions">
-                            <a th:href="@{/maintenances/edit/{id}(id=${maint.maintenanceId})}"
-                               class="btn btn-sm btn-icon btn-outline-primary"
-                               data-bs-toggle="tooltip" title="Sửa">
+                            <a th:href="@{/maintenances/edit/{id}(id=${maint.maintenanceId})}" class="btn btn-sm btn-icon btn-outline-primary" data-bs-toggle="tooltip" title="Sửa">
                                 <i class="bx bx-edit-alt"></i>
                             </a>
-                            <button class="btn btn-sm btn-icon btn-outline-danger btn-delete"
-                                    th:data-id="${maint.maintenanceId}"
-                                    th:data-name="'#' + ${maint.maintenanceId} + ' (Xe ' + (${maint.bikeId?.bikeName} ?: ${maint.bikeId?.bikeId}) + ')'"
-                                    data-bs-toggle="modal" data-bs-target="#deleteConfirmModal"
-                                    data-bs-toggle-tooltip="tooltip" title="Xóa">
+                            <a th:href="@{/maintenances/delete/{id}(id=${maint.maintenanceId})}"
+                               class="btn btn-sm btn-icon btn-outline-danger btn-delete"
+                               th:data-desc="${maint.maintenanceDesc}"
+                               data-bs-toggle="tooltip" title="Xóa"
+                               th:onclick="'return confirm(\'Bạn có chắc chắn muốn xóa lịch bảo trì cho xe \' + /*[[${maint.bikeId?.bikeName}]]*/ + \'?\');'">
                                 <i class="bx bx-trash"></i>
-                            </button>
+                            </a>
                         </div>
                     </td>
                 </tr>
@@ -109,39 +116,54 @@
     <nav class="mt-4" aria-label="Page navigation" th:if="${totalPages != null and totalPages > 1}">
         <ul id="pagination" class="pagination justify-content-center">
             <li class="page-item" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
-                <a class="page-link" th:href="@{/maintenances(page=${currentPage - 1}, keyword=${keyword}, searchType=${searchType}, sortField=${sortField}, sortDir=${sortDir})}">&laquo;</a>
+                <a class="page-link" th:href="@{/maintenances(page=${currentPage - 1}, sortType=${sortType}, order=${order}, keyword=${keyword}, searchType=${searchType})}">&laquo;</a>
             </li>
+
             <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
                 th:classappend="${i == currentPage ? 'active' : ''}">
-                <a class="page-link" th:href="@{/maintenances(page=${i}, keyword=${keyword}, searchType=${searchType}, sortField=${sortField}, sortDir=${sortDir})}" th:text="${i + 1}"></a>
+                <a class="page-link" th:href="@{/maintenances(page=${i}, sortType=${sortType}, order=${order}, keyword=${keyword}, searchType=${searchType})}" th:text="${i + 1}"></a>
             </li>
+
             <li class="page-item" th:classappend="${currentPage == (totalPages - 1) ? 'disabled' : ''}">
-                <a class="page-link" th:href="@{/maintenances(page=${currentPage + 1}, keyword=${keyword}, searchType=${searchType}, sortField=${sortField}, sortDir=${sortDir})}">&raquo;</a>
+                <a class="page-link" th:href="@{/maintenances(page=${currentPage + 1}, sortType=${sortType}, order=${order}, keyword=${keyword}, searchType=${searchType})}">&raquo;</a>
             </li>
         </ul>
     </nav>
-    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-sm">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="deleteConfirmModalLabel">Xác nhận Xóa</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form id="delete-form" th:action="@{/maintenances/delete/0}" method="post"> <div class="modal-body">
-                    Bạn có chắc chắn muốn xóa lịch bảo trì <strong id="maint-name-to-delete"></strong> không?
-                </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
-                        <button type="submit" class="btn btn-danger">Xóa</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
 </div>
 
 <th:block layout:fragment="page_scripts">
-    <script th:src="@{/js/maintenance_list.js}"></script>
+    <script>
+        $(document).ready(function() {
+            const currentSearchType = /*[[${searchType}]]*/ null;
+            let initialFormId = 'search-bikeId-form'; // Mặc định
+            let initialDropdownText = 'Tìm theo ID Xe';
+
+            if (currentSearchType === 'date') {
+                initialFormId = 'search-date-form';
+                initialDropdownText = 'Tìm theo Ngày';
+            } else if (currentSearchType === 'bikeId') {
+                initialFormId = 'search-bikeId-form';
+                initialDropdownText = 'Tìm theo ID Xe';
+            }
+
+            // Hiển thị form đúng khi tải lại trang (nếu đang tìm kiếm)
+            if (currentSearchType) {
+                $('#' + initialFormId).show();
+                $('#searchDropdown').text(initialDropdownText);
+            } else {
+                $('#searchDropdown').text('Tìm kiếm theo...');
+            }
+
+            // Xử lý khi chọn loại tìm kiếm
+            $('.search-type-select').on('click', function(e) {
+                e.preventDefault();
+                const targetFormId = $(this).data('target-form');
+                $('.search-form').hide(); // Ẩn tất cả form
+                $('#' + targetFormId).show(); // Hiển thị form được chọn
+                $('#searchDropdown').text('Tìm theo ' + $(this).text()); // Cập nhật text dropdown
+            });
+        });
+    </script>
 </th:block>
 </body>
 </html>

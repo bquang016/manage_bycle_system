@@ -63,8 +63,8 @@ public class MaintenanceService {
             throw new IllegalArgumentException("Ngày bảo trì không được để trống");
         }
 
-        if (maintenance.getMaintenanceDate().isAfter(LocalDate.now())) {
-            throw new IllegalArgumentException("Ngày bảo trì không được nằm trong tương lai");
+        if (maintenance.getMaintenanceDate().isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException("Ngày bảo trì không được nằm trong quá khứ");
         }
 
         if (maintenance.getMaintenanceCost() < 0) {
@@ -100,8 +100,8 @@ public class MaintenanceService {
         if (newData.getMaintenanceDate() != null
                 && !Objects.equals(existing.getMaintenanceDate(), newData.getMaintenanceDate())) {
 
-            if (newData.getMaintenanceDate().isAfter(LocalDate.now())) {
-                throw new IllegalArgumentException("Ngày bảo trì không được nằm trong tương lai.");
+            if (newData.getMaintenanceDate().isBefore(LocalDate.now())) {
+                throw new IllegalArgumentException("Ngày bảo trì không được nằm trong quá khứ.");
             }
 
             existing.setMaintenanceDate(newData.getMaintenanceDate());

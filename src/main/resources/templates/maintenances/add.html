@@ -30,8 +30,8 @@
                     <form th:action="@{/maintenances/add}" th:object="${maintenance}" method="post">
 
                         <div class="mb-3">
-                            <label class="form-label" for="bikeId">Chọn xe bảo trì</label>
-                            <select class="form-select" id="bikeId" th:field="*{bikeId}" required="required">
+                            <label class="form-label" for="bikeIdSelect">Chọn xe bảo trì</label>
+                            <select class="form-select" id="bikeIdSelect" name="bikeId" required="required">                                <option value="">-- Chọn xe --</option>
                                 <option value="">-- Chọn xe --</option>
                                 <option th:each="bike : ${bikes}"
                                         th:value="${bike.bikeId}"
