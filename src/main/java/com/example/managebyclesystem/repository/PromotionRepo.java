@@ -10,6 +10,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
+
 @Repository
 public interface PromotionRepo extends JpaRepository<Promotion, Integer> {
 
@@ -58,4 +60,14 @@ public interface PromotionRepo extends JpaRepository<Promotion, Integer> {
             (:status IS NULL OR p.promotionStatus = :status)
         """)
     Page<Promotion> searchPromotions(@Param("keyword") String keyword, @Param("status") PromotionStatus status, Pageable pageable);
+
+    @Query("""
+         SELECT p FROM Promotion p
+         WHERE p.promotionStatus = :status
+         AND p.promotionStartDate <= :currentDate
+         AND p.promotionEndDate >= :currentDate
+     """)
+    Page<Promotion> findActivePromotions(@Param("currentDate") LocalDate currentDate,
+                                         @Param("status") PromotionStatus status,
+                                         Pageable pageable);
 }
