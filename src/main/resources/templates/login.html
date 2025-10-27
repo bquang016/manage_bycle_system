@@ -11,6 +11,56 @@
     <link rel="stylesheet" href="https://demos.themeselection.com/sneat-bootstrap-html-admin-template-free/assets/vendor/css/pages/page-auth.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/boxicons/2.1.4/css/boxicons.min.css" />
 
+    <style>
+        .success-animation {
+            display: inline-block;
+        }
+        .checkmark {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: block;
+            stroke-width: 3;
+            stroke: #28a745; /* Màu xanh success */
+            stroke-miterlimit: 10;
+            box-shadow: inset 0px 0px 0px #28a745;
+            animation: fill .4s ease-in-out .4s forwards, scale .3s ease-in-out .9s both;
+            margin: 0 auto;
+        }
+        .checkmark__circle {
+            stroke-dasharray: 166;
+            stroke-dashoffset: 166;
+            stroke-width: 2;
+            stroke-miterlimit: 10;
+            stroke: #28a745;
+            fill: #fff;
+            animation: stroke .6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+        }
+        .checkmark__check {
+            transform-origin: 50% 50%;
+            stroke-dasharray: 48;
+            stroke-dashoffset: 48;
+            animation: stroke .3s cubic-bezier(0.65, 0, 0.45, 1) .8s forwards;
+        }
+        @keyframes stroke {
+            100% {
+                stroke-dashoffset: 0;
+            }
+        }
+        @keyframes scale {
+            0%, 100% {
+                transform: none;
+            }
+            50% {
+                transform: scale3d(1.1, 1.1, 1);
+            }
+        }
+        @keyframes fill {
+            100% {
+                box-shadow: inset 0px 0px 0px 40px #28a745;
+            }
+        }
+    </style>
 </head>
 <body>
 <div class="container-xxl">
@@ -20,7 +70,8 @@
                 <div class="card-body">
                     <div class="app-brand justify-content-center mb-4">
                         <a th:href="@{/}" class="app-brand-link gap-2">
-                            <img th:src="@{/img/logoxee.png}" alt="Logo" style="max-height: 50px;" /> </a>
+                            <img th:src="@{/img/logoxee.png}" alt="Logo" style="max-height: 80px; width: auto;" />
+                        </a>
                     </div>
                     <h4 class="mb-2 text-center">Chào mừng trở lại! 👋</h4>
                     <p class="mb-4 text-center">Vui lòng đăng nhập vào tài khoản của bạn</p>
@@ -41,7 +92,8 @@
 
                     <form id="formAuthentication" class="mb-3" th:action="@{/login}" method="post">
                         <div class="mb-3">
-                            <label for="username" class="form-label">Tên đăng nhập</label> <input type="text" class="form-control" id="username" name="username" placeholder="Nhập tên đăng nhập" autofocus required/>
+                            <label for="username" class="form-label">Tên đăng nhập</label>
+                            <input type="text" class="form-control" id="username" name="username" placeholder="Nhập tên đăng nhập" autofocus required/>
                         </div>
                         <div class="mb-3 form-password-toggle">
                             <div class="d-flex justify-content-between">
@@ -59,9 +111,27 @@
 
                     <p class="text-center">
                         <span>Chưa có tài khoản?</span>
-                        <a th:href="@{/register}"> <span>Tạo tài khoản mới</span>
+                        <a th:href="@{/register}">
+                            <span>Tạo tài khoản mới</span>
                         </a>
                     </p>
+
+                    <div class="modal fade" id="loginSuccessModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+                        <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+                            <div class="modal-content">
+                                <div class="modal-body text-center p-4">
+                                    <div class="success-animation mb-3">
+                                        <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                                            <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none" />
+                                            <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
+                                        </svg>
+                                    </div>
+                                    <h4 class="mb-2">Đăng nhập thành công!</h4>
+                                    <p class="text-muted">Đang chuyển hướng bạn...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -70,8 +140,8 @@
 <script src="https://demos.themeselection.com/sneat-bootstrap-html-admin-template-free/assets/vendor/libs/jquery/jquery.js"></script>
 <script src="https://demos.themeselection.com/sneat-bootstrap-html-admin-template-free/assets/vendor/libs/popper/popper.js"></script>
 <script src="https://demos.themeselection.com/sneat-bootstrap-html-admin-template-free/assets/vendor/js/bootstrap.js"></script>
+
 <script>
-    // Simple password toggle
     document.querySelectorAll('.form-password-toggle .input-group-text').forEach(item => {
         item.addEventListener('click', event => {
             const icon = item.querySelector('i');
@@ -89,6 +159,30 @@
             }
         });
     });
+
+    const loginForm = document.getElementById('formAuthentication');
+    const loginModalElement = document.getElementById('loginSuccessModal');
+    let loginModal = null;
+    if (loginModalElement) {
+        loginModal = new bootstrap.Modal(loginModalElement);
+    }
+
+    if (loginForm && loginModal) {
+        loginForm.addEventListener('submit', function(e) {
+            if (!loginForm.checkValidity()) {
+                return;
+            }
+
+            loginModal.show();
+
+            const submitButton = loginForm.querySelector('button[type="submit"]');
+            if (submitButton) {
+                submitButton.disabled = true;
+                submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Đang xử lý...';
+            }
+
+        });
+    }
 </script>
 </body>
 </html>
