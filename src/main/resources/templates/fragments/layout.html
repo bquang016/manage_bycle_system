@@ -52,12 +52,7 @@
             </div>
             <div class="menu-inner-shadow"></div>
             <ul class="menu-inner py-1">
-                <li class="menu-item" th:classappend="${#strings.equals(activeMenu, 'dashboard') ? 'active' : ''}">
-                    <a th:href="@{/dashboard}" class="menu-link"> <i class="menu-icon tf-icons bx bx-home-circle"></i> <div>Dashboard</div> </a>
-                </li>
-                <li class="menu-item" th:classappend="${#strings.equals(activeMenu, 'pos') ? 'active' : ''}">
-                    <a th:href="@{/pos}" class="menu-link"> <i class="menu-icon tf-icons bx bx-cart-alt"></i> <div>Bán hàng (POS)</div> </a>
-                </li>
+
                 <li class="menu-item" th:classappend="${#strings.equals(activeMenu, 'bikes') ? 'active' : ''}">
                     <a th:href="@{/bikes}" class="menu-link"> <i class="menu-icon tf-icons bx bx-list-ul"></i> <div>Quản lý Xe đạp</div> </a>
                 </li>
@@ -71,7 +66,7 @@
                     <a th:href="@{/rental-orders}" class="menu-link"> <i class="menu-icon tf-icons bx bx-receipt"></i> <div>Quản lý Đơn thuê</div> </a>
                 </li>
                 <li class="menu-item" th:classappend="${#strings.equals(activeMenu, 'staffs') ? 'active' : ''}">
-                    <a th:href="@{/staffs/page}" class="menu-link"> <i class="menu-icon tf-icons bx bx-user-pin"></i> <div>Quản lý Nhân viên</div> </a>
+                    <a th:href="@{/staffs}" class="menu-link"> <i class="menu-icon tf-icons bx bx-user-pin"></i> <div>Quản lý Nhân viên</div> </a>
                 </li>
                 <li class="menu-item" th:classappend="${#strings.equals(activeMenu, 'payments') ? 'active' : ''}">
                     <a th:href="@{/payments}" class="menu-link"> <i class="menu-icon tf-icons bx bx-credit-card"></i> <div>Quản lý Thanh toán</div> </a>
